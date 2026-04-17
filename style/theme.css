@@ -1,0 +1,117 @@
+
+h1, h2, h3, h4, h5, h6, p, small {
+  color: var(--foreground);
+}
+
+a {
+  color: var(--primary);
+  transition: color 0.2s;
+}
+
+a:hover { color: var(--primary-dark); }
+
+.base {
+  background: var(--background);
+  color: var(--foreground);
+}
+.menu {
+  background: var(--menu);
+  color: var(--menu-foreground);
+}
+.panel {
+  background: var(--menu);
+  color: var(--menu-foreground);
+}
+.card {
+  background: var(--card);
+  color: var(--card-foreground);
+}
+.rail {
+  background: var(--menu);
+  color: var(--menu-foreground);
+}
+.border {
+  border: var(--border-style);
+}
+.border-2 { border: 2px solid var(--border); }
+
+.primary { background: var(--primary); color: var(--primary-foreground); }
+.secondary { background: var(--secondary); color: var(--secondary-foreground); }
+.accent { border-color: transparent; background: var(--primary-ghost); color: var(--primary-dark); }
+.destructive { background: var(--destructive); color: var(--destructive-foreground); }
+.muted { background: var(--muted); color: var(--muted-foreground); }
+.inactive { background: transparent; color: var(--muted-dark); }
+
+.text.primary { background:initial; color: var(--primary); }
+.text.secondary { background: initial; color: var(--secondary); }
+.text.accent { border-color: initial; background: initial; color: var(--accent); }
+.text.destructive { background: initial; color: var(--destructive); }
+.text.muted { background: initial; color: var(--muted-foreground); }
+.text.inactive { background: initial; color: var(--muted); }
+
+.disabled { cursor: not-allowed; opacity: 0.6; pointer-events: none; }
+
+input {
+  background: var(--input);
+  color: var(--input-foreground);
+  border: var(--border-style);
+}
+input:focus {
+  box-shadow: 0 0 2px 1px var(--primary);
+}
+header {
+  border-bottom: 1px solid var(--border);
+}
+
+button {
+  --button-color: var(--foreground);
+  --button-foreground: var(--background);
+  --button-hover: 90%;
+  --button-ghost: color-mix(in oklch, var(--button-color), transparent 95%);
+  background: transparent;
+  color: var(--button-color);
+  /* border: var(--border-style); */
+}
+button:hover { background: color-mix(in oklch, var(--button-color), transparent var(--button-hover)); z-index: 10; }
+button.primary { --button-color: var(--primary); --button-foreground: var(--primary-foreground); --button-light: var(--primary-light); --button-dark: var(--primary-dark); --button-border: var(--primary); --button-hover: 30%;}
+button.secondary { --button-color: var(--secondary); --button-foreground: var(--secondary-foreground); --button-light: var(--secondary-light); --button-dark: var(--secondary-dark); --button-border: var(--secondary); --button-hover: 30%; }
+button.accent { --button-color: var(--accent); --button-foreground: var(--accent-foreground); --button-light: var(--accent); --button-dark: var(--accent); --button-border: var(--accent); }
+button.muted { --button-color: var(--muted-foreground); --button-foreground: var(--muted); --button-light: var(--muted); --button-dark: var(--muted-foreground); --button-border: var(--muted); z-index: var(--z-inactive); }
+button.muted:hover { z-index: var(--z-focus) }
+
+button.background { --button-color: var(--background); --button-foreground: var(--foreground); --button-light: var(--muted); --button-dark: var(--muted-foreground); --button-border: var(--muted); }
+
+button[data-state='inactive']:hover { background: var(--muted); color: var(--primary-light); }
+button[data-state='active'] { background: var(--primary); color: white; box-shadow: 0 4px 6px -1px var(--primary); }
+
+button[data-state='false'] { background: transparent; color: var(--button-dark) }
+button[data-state='true'] { background: var(--button-color); color: var(--button-foreground); }
+
+button.ghost { border-color: transparent; background: var(--border); color: var(--button-color); }
+button.ghost:hover { border-color: transparent; background: color-mix(in oklch, var(--button-color), transparent 80%); color: var(--button-color); }
+button.outline { border: var(--border-style); border-color: var(--button-color); background: transparent; color: var(--button-color);}
+button.outline:hover { background: var( --button-ghost); }
+
+button.hoverline { border-color: transparent; border: var(--border-style); background: color-mix(in oklch, var(--button-color), transparent 95%); color: var(--button-dark);}
+button.hoverline:hover { border-color: var(--button-color); color: var(--button-dark);}
+
+
+::-webkit-scrollbar {
+  width: .33rem;
+  height: .33rem;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scroll-thumb);
+  border-radius: 10px;
+  border: 2px solid var(--scroll-track);
+}
+
+/* 4. Hover effect */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent);
+}

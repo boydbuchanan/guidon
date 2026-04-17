@@ -1,0 +1,133 @@
+
+:root {
+  /* Theme Colors */
+
+  --background-hex: #f8fafc;
+  --foreground-hex: #000000;
+  --primary-hex: #1d6ebb;
+  --primary-foreground-hex: #f6f6f6;
+  --secondary-hex: #0f172a;
+  --secondary-foreground-hex: #f6f6f6;
+  
+  --accent-foreground-hex: #e7f7fc;
+  --accent-hex: #089ccb;
+
+  --ghost-hex: #e0e7ff;
+  --ghost-foreground-hex: #0f172a;
+  --ghost-hover-hex: #e2e8f0;
+
+  --muted-hex: #dedede;
+  --muted-foreground-hex: #666666;
+  --destructive-hex: #e33d65;
+  --destructive-foreground-hex: #ffffff;
+  --highlight-1-hex: #73fce5;
+  --highlight-2-hex: #fcc875;
+  --highlight-3-hex: #8bfea6;
+  --highlight-4-hex: #6296fe;
+  --highlight-5-hex: #ffbaef;
+
+  /* Controls */
+
+  /* --border-hex: #e0e7ff; */
+  --border-hex: #e6e6e6;
+  --input-hex: #ffffff;
+  --input-foreground-hex: #0f172a;
+
+  --ring-hex: #b3edff;
+  --scroll-track-hex: transparent;
+  --scroll-thumb-hex: #ccc;
+
+  /* Components */
+
+  --menu-hex: #ffffff;
+  --menu-foreground-hex: #666666;
+  --card-hex: #f8fafc;
+  --card-foreground-hex: #000000;
+
+
+  /* Variables */
+
+  --background: oklch(from var(--background-hex) l c h);
+  --foreground: oklch(from var(--foreground-hex) l c h);
+
+  --primary: var(--primary-hex);
+  --primary-foreground: var(--primary-foreground-hex);
+  --primary-light: oklch(from var(--primary-hex) 0.6 c h);
+  --primary-dark:  oklch(from var(--primary-hex) 0.3 c h);
+  --primary-ghost: color-mix(in oklch, var(--primary), transparent 80%);
+  --primary-ghost-hover: color-mix(in oklch, var(--primary), transparent 90%);
+
+  --secondary: var(--secondary-hex);
+  --secondary-foreground: var(--secondary-foreground-hex);
+  --secondary-light: oklch(from var(--secondary-hex) 0.4 c h);
+  --secondary-dark:  oklch(from var(--secondary-hex) 0.3 c h);
+  --secondary-ghost: color-mix(in oklch, var(--secondary), transparent 85%);
+
+  --muted: oklch(from var(--muted-hex) l c h);
+  --muted-foreground: oklch(from var(--muted-hex) 0.4 c h);
+  --muted-dark: oklch(from var(--muted-hex) 0.8 c h);
+
+  --accent: var(--accent-hex);
+  --accent-foreground: var(--accent-foreground-hex);
+  
+  --destructive: oklch(from var(--destructive-hex) l c h);
+  --destructive-foreground: oklch(from var(--destructive-hex) 0.15 c h);
+
+  --highlight-1: var(--highlight-1-hex);
+  --highlight-2: var(--highlight-2-hex);
+  --highlight-3: var(--highlight-3-hex);
+  --highlight-4: var(--highlight-4-hex);
+  --highlight-5: var(--highlight-5-hex);
+
+  --border: oklch(from var(--border-hex) l c h);
+  --border-style: 1px solid var(--border);
+
+  --input: oklch(from var(--input-hex) l c h);
+  --ring:  color-mix(in oklch, var(--ring), transparent 85%);
+  --scroll-track: oklch(from var(--scroll-track-hex) l c h);
+  --scroll-thumb: oklch(from var(--scroll-thumb-hex) l c h);
+
+
+  --card: oklch(from var(--card-hex) l c h);
+  --card-border: oklch(from var(--card-hex) 0.8 c h);
+  --card-foreground: oklch(from var(--card-hex) 0.2 c h);
+
+  --menu: oklch(from var(--menu-hex) l c h);
+  --menu-foreground: oklch(from var(--menu-foreground-hex) l c h);
+}
+
+[data-theme='dark'] {
+  /* Theme Colors */
+  --background-hex: #111111;
+  --foreground-hex: #eeeeee;
+
+  --primary-hex: #1d6ebb;
+  --primary-foreground-hex: #000000;
+  --secondary-hex: #ffffff;
+  --secondary-foreground-hex: #0e0808;
+  --accent-hex: #b8edff;
+  --accent-foreground-hex: #07779c;
+  --muted-hex: #212121;
+  --muted-foreground-hex: #dedede;
+  --destructive-hex: #b70101;
+  --destructive-foreground-hex: #fafafa;
+  --highlight-1-hex: #73fce5;
+  --highlight-2-hex: #fcc875;
+  --highlight-3-hex: #8bfea6;
+  --highlight-4-hex: #6296fe;
+  --highlight-5-hex: #1f3fad;
+
+  /* Controls */
+
+  --border-hex: #474747;
+  --input-hex: #828282;
+  --ring-hex: #b8edff;
+  --scroll-track-hex: transparent;
+  --scroll-thumb-hex: #474747;
+  
+  /* Components */
+  --menu-hex: #000000;
+  --menu-foreground-hex: #ffffff;
+  --card-hex: #141414;
+  --card-foreground-hex: #ffffff;
+}
