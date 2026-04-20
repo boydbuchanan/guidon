@@ -2,6 +2,12 @@ import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
 import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTAINER_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, type BaseProps, type ButtonVariantProps, type ContainerProps, type Flags, type RailLayoutFlags, type StyleProps } from "./types";
 import { pluck, split, toClassNames, cx, flagClass } from "./utils";
 
+/**
+ * Container component for layout.
+ * Renders a div by default, but can render any component specified by the 'as' prop.
+ * Supports flex layout with 'row' and 'col' props, as well as a 'fit' prop to make the container take the full size of its parent.
+ * Matches .container css class; by default, has padding.
+ */
 export function Container({
   as: Component = "div", // Default to div
   className = 'container',
@@ -36,6 +42,11 @@ export function Container({
   return <Component className={cx(baseClasses, otherClasses)} {...rest} />
 };
 
+/**
+ * Text component for typography. Renders a span by default, but can render any component specified by the 'as' prop.
+ * Should be used with h1-h6, p, or other text elements to ensure semantic HTML.
+ * Matches .text css class.
+ */
 export function Text({as = "span",className,...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType }) {
   const Component = (as) as React.ElementType;
   return <Component className={cx('text', className)} {...props} />
@@ -78,6 +89,12 @@ export function SvgIcon({
   );
 }
 
+/**
+ * Button component for actions. Renders a button element with various styling options based on props.
+ * Supports variants like 'ghost', 'outline', 'light', 'dark', and 'link' through boolean props.
+ * Also supports theme and flex styling through the base utility props.
+ * Matches .button css class, with additional classes based on variants and state.
+ */
 export function Button({
   className,
   ...props
@@ -128,6 +145,7 @@ export function RadioGroup({
 }
 /**
  * Default Content component for layout. Renders a flex container with optional row or column layout.
+ * For .content css class, by default not padded
  * @param {boolean} row - If true, renders a row layout. Defaults to true.
  * @param {boolean} col - If true, renders a column layout. Defaults to false.
  */
