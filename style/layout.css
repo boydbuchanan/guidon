@@ -358,8 +358,7 @@ header.sticky {
 .col.bottom { justify-content: flex-end; }
 .row.middle { align-items: center; }
 .col.middle { justify-content: center; }
-.row.stretch { align-items: stretch; }
-.col.stretch { justify-content: stretch; }
+
 
 .row.left { justify-content: flex-start; }
 .col.left { align-items: flex-start; }
@@ -367,11 +366,14 @@ header.sticky {
 .col.right { align-items: flex-end; }
 .row.center { justify-content: center; }
 .col.center { align-items: center; }
-.col.baseline:not(.center, .left, .right), .row.baseline:not(.center, .top, .bottom){ align-items: center; }
 
-.col.between, .row.between { justify-content: space-between; }
-.col.around, .row.around { justify-content: space-around; }
-.col.even, .row.even { justify-content: space-evenly; }
+.col.stretch:not(.left,  .center,  .right), .row.stretch:not(.top,  .middle, .bottom) { align-items: stretch; }
+.col.baseline:not(.left, .center,  .right), .row.baseline:not(.top, .middle, .bottom){ align-items: center; }
+
+.col.between:not(.top, .middle, .bottom), .row.between:not(.left, .center,  .right) { justify-content: space-between; }
+.col.around:not(.top, .middle, .bottom), .row.around:not(.left, .center,  .right) { justify-content: space-around; }
+.col.even:not(.top, .middle, .bottom), .row.even:not(.left, .center,  .right) { justify-content: space-evenly; }
+
 .col.nowrap, .row.nowrap { flex-wrap: nowrap; }
 
 .col.wrap, .row.wrap { flex-wrap: wrap; }

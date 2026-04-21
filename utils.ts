@@ -1,8 +1,20 @@
 import { FLEX_KEYS, THEME_KEYS, type Flags, type FlexProps, type ThemeFlags } from "./types";
 
 
-export function cx(...args: (string | undefined | boolean)[]) {
-  return args.filter(Boolean).join(' ');
+export function cx(...args: (string | undefined | boolean | null)[]): string {
+  const classes = new Set<string>();
+
+  args.forEach((arg) => {
+    // Only process truthy strings
+    if (typeof arg === 'string' && arg.trim()) {
+      // Split by any whitespace (handles multiple spaces or newlines)
+      arg.split(/\s+/).forEach((cls) => {
+        if (cls) classes.add(cls);
+      });
+    }
+  });
+
+  return Array.from(classes).join(' ');
 }
 
 export function pluck<T extends object, K extends readonly string[]>(
@@ -65,11 +77,23 @@ export function flagClass<T extends Record<string, any>>(
   const active = keys.find(key => options[key] === true);
   return active || undefined;
 }
+
 export function toClassNames(splitProps: ReturnType<typeof split>) {
   return cx(
+    flagsToString(splitProps.flags),
     themeClasses(splitProps.theme),
     flexClasses(splitProps.flex),
   );
+}
+
+/**
+ * Converts a Flags object into a space-separated string of active keys.
+ */
+export function flagsToString<T extends readonly string[]>(flags: Flags<T>): string {
+  return Object.entries(flags)
+    .filter(([_, value]) => Boolean(value)) // Ensure truthy values only
+    .map(([key]) => key)
+    .join(' ');
 }
 
 export function flexClasses(options?: FlexProps): string {

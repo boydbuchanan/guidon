@@ -8,8 +8,16 @@ export type Arrays<T extends readonly string[]> = {
 
 export type FlexMode = "row" | "col";
 export type Horizontal = "left" | "right" | "center"
-export type Vertical = "top" | "bottom" | "middle" | "stretch";
+export type Vertical = "top" | "bottom" | "middle";
 export type Spacing = "even" | "between" | "around";
+export type Stretch = "stretch" | "baseline";
+
+export type Alignment = {
+  horizontal?: Horizontal;
+  vertical?: Vertical;
+  stretch?: Stretch;
+  spacing?: Spacing;
+}
 
 export const FLEX_KEYS = ['mode', 'side', 'vertical', 'spacing', 'wrap', 'reverse', 'baseline', 'gap', 'pad'] as const;
 export type FlexProps = {
@@ -18,6 +26,7 @@ export type FlexProps = {
   vertical?: Vertical;
   spacing?: Spacing;
   wrap?: boolean;
+  wrapAlign?: Alignment;
   reverse?: boolean;
   baseline?: boolean;
   gap?: number | boolean;
@@ -45,7 +54,14 @@ export const STATE_MAP: Arrays<typeof STATE_KEYS> = {
   bool:    STATE_DEFAULT,
 };
 
-export const CONTAINER_KEYS = ['row', 'col', 'fit'] as const;
+export const CONTAINER_KEYS = [
+  'row', 'col', 
+  'fit', 
+  'left', 'right', 'center', // horizontal
+  'top', 'middle', 'bottom',  // vertical
+  'start', 'origin', 'end', // wrap alignment
+  'stretch', 'baseline', 
+  'even', 'between', 'around'] as const;
 export type ContainerProps = StateTypeFlags & StyleProps & Flags<typeof CONTAINER_KEYS>;
 
 export const BUTTON_VARIANT_KEYS = ['hoverline', 'ghost', 'outline'] as const;

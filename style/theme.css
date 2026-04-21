@@ -82,7 +82,7 @@ button.muted:hover { z-index: var(--z-focus) }
 button.background { --button-color: var(--background); --button-foreground: var(--foreground); --button-light: var(--muted); --button-dark: var(--muted-foreground); --button-border: var(--muted); }
 
 button[data-state='inactive']:hover { background: var(--muted); color: var(--primary-light); }
-button[data-state='active'] { background: var(--primary); color: white; box-shadow: 0 4px 6px -1px var(--primary); }
+button[data-state='active'] { background: var(--primary); color: white; }
 
 button[data-state='false'] { background: transparent; color: var(--button-dark) }
 button[data-state='true'] { background: var(--button-color); color: var(--button-foreground); }

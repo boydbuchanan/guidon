@@ -1,6 +1,6 @@
 import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
 import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTAINER_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, type BaseProps, type ButtonVariantProps, type ContainerProps, type Flags, type RailLayoutFlags, type StyleProps } from "./types";
-import { pluck, split, toClassNames, cx, flagClass } from "./utils";
+import { pluck, split, toClassNames, cx, flagClass, flagsToString } from "./utils";
 
 /**
  * Container component for layout.
@@ -11,9 +11,6 @@ import { pluck, split, toClassNames, cx, flagClass } from "./utils";
 export function Container({
   as: Component = "div", // Default to div
   className = 'container',
-  row,
-  col,
-  fit,
   ...props
 }: React.ComponentProps<typeof StateContent> & ContainerProps) {
   const [, base] = pluck(props, STATE_KEYS);
@@ -21,25 +18,39 @@ export function Container({
   if(props.debug)
     console.log("Container props: ", { flags, flex, theme });
 
-  if(col || row) {
-    if(col) flex.mode = 'col';
-    else if(row) flex.mode = 'row';
+  // Shortcuts to setting flex properties based on flags
+  if(flags.col || flags.row) {
+    if(flags.col) flex.mode = 'col';
+    else if(flags.row) flex.mode = 'row';
   }
-  
+  if(flags.left || flags.right || flags.center) {
+    if(flags.center) flex.horizontal = 'center';
+    else if(flags.left) flex.horizontal = 'left';
+    else if(flags.right) flex.horizontal = 'right';
+  }
+  if(flags.top || flags.bottom || flags.middle) {
+    if(flags.middle) flex.vertical = 'middle';
+    else if(flags.top) flex.vertical = 'top';
+    else if(flags.bottom) flex.vertical = 'bottom';
+  }
+  if(flags.even || flags.between || flags.around) {
+    if(flags.even) flex.spacing = 'even';
+    else if(flags.between) flex.spacing = 'between';
+    else if(flags.around) flex.spacing = 'around';
+  }
+  // Flags and Flex will generate duplicate properties but CX will deduplicate
   const baseClasses = toClassNames({ flags, rest, flex, theme });
   if(props.debug)
     console.log("Base Classes: ", baseClasses);
-
-  const otherClasses = cx(fit && 'fit', className);
 
   if(props.id){
     
     var stateType = STATE_KEYS.find(type => props[type] === true);
     const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
 
-    return <StateContent trueState={on} falseState={off} {...rest} className={cx(baseClasses, otherClasses, stateType)} />
+    return <StateContent trueState={on} falseState={off} {...rest} className={cx(baseClasses, stateType, className)} />
   }
-  return <Component className={cx(baseClasses, otherClasses)} {...rest} />
+  return <Component className={cx(baseClasses, className)} {...rest} />
 };
 
 /**
