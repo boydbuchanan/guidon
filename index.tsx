@@ -1,22 +1,22 @@
 import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
-import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTAINER_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, type BaseProps, type ButtonVariantProps, type ContainerProps, type Flags, type RailLayoutFlags, type StyleProps } from "./types";
+import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, type BaseProps, type ButtonVariantProps, type ContentProps, type Flags, type RailLayoutFlags, type StyleProps } from "./types";
 import { pluck, split, toClassNames, cx, flagClass, flagsToString } from "./utils";
 
 /**
  * Container component for layout.
  * Renders a div by default, but can render any component specified by the 'as' prop.
  * Supports flex layout with 'row' and 'col' props, as well as a 'fit' prop to make the container take the full size of its parent.
- * Matches .container css class; by default, has padding.
+ * Matches .content css class; by default, no padding.
  */
-export function Container({
+export function Content({
   as: Component = "div", // Default to div
-  className = 'container',
+  className = 'content',
   ...props
-}: React.ComponentProps<typeof StateContent> & ContainerProps) {
+}: React.ComponentProps<typeof StateContent> & ContentProps) {
   const [, base] = pluck(props, STATE_KEYS);
-  const { flags, rest, flex, theme } = split(base, CONTAINER_KEYS);
+  const { flags, rest, flex, theme } = split(base, CONTENT_KEYS);
   if(props.debug)
-    console.log("Container props: ", { flags, flex, theme });
+    console.log("Content props: ", { flags, flex, theme });
 
   // Shortcuts to setting flex properties based on flags
   if(flags.col || flags.row) {
@@ -48,7 +48,7 @@ export function Container({
     var stateType = STATE_KEYS.find(type => props[type] === true);
     const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
 
-    return <StateContent trueState={on} falseState={off} {...rest} className={cx(baseClasses, stateType, className)} />
+    return <StateContent trueState={on} falseState={off} className={cx(baseClasses, stateType, className)} style={{ anchorName: `--anchor-${props.id}` }} {...rest}  />
   }
   return <Component className={cx(baseClasses, className)} {...rest} />
 };
@@ -136,7 +136,7 @@ export function Group({
   ...props
 }: React.ComponentProps<typeof Container>) {
   return (
-    <Container className={cx('joined borders', className)} row={col ? false : true} col={col ? true : false} {...props}/>
+    <Content className={cx('joined borders', className)} row={col ? false : true} col={col ? true : false} {...props}/>
   )
 }
 /**
@@ -151,7 +151,7 @@ export function RadioGroup({
   ...props
 }: React.ComponentProps<typeof Container>) {
   return (
-    <Container className={cx('joined radio', className)} row={col ? false : true} col={col ? true : false} {...props}/>
+    <Content className={cx('joined radio', className)} row={col ? false : true} col={col ? true : false} {...props}/>
   )
 }
 /**
@@ -160,13 +160,13 @@ export function RadioGroup({
  * @param {boolean} row - If true, renders a row layout. Defaults to true.
  * @param {boolean} col - If true, renders a column layout. Defaults to false.
  */
-export function Content({
+export function Container({
   row,
   col,
   className,
   ...props
-}: React.ComponentProps<typeof Container>) {
-  return <Container className={cx('content', className)} col={row ? false : true} row={row ? true : false} {...props}/>
+}: React.ComponentProps<typeof Content>) {
+  return <Content className={cx('container', className)} col={row ? false : true} row={row ? true : false} {...props}/>
 };
 /**
  * Default Content component for layout. Renders a flex container with column layout.
@@ -176,7 +176,7 @@ export function Col({
   className,
   ...props
 }: React.ComponentProps<typeof Container>) {
-  return <Container className={cx('content', className)} col row={false} {...props}/>
+  return <Content col row={false} {...props}/>
 }
 /**
  * Default Content component for layout. Renders a flex container with row layout.
@@ -186,7 +186,7 @@ export function Row({
   className,
   ...props
 }: React.ComponentProps<typeof Container>) {
-  return <Container className={cx('content', className)} row col={false} {...props}/>
+  return <Content row col={false} {...props}/>
 };
 export const PANEL_KEYS = ['left', 'right', 'top', 'bottom', 'center'] as const;
 export type PanelFlags = Flags<typeof PANEL_KEYS>;
@@ -420,7 +420,7 @@ export function SquareCheckIcon({ ...props }: SvgIconProps) {
     </SvgIcon>
   )
 }
-import { LocalProvider, RadioProvider, SelectionProvider, type MinMax } from "./state.client";
+import { LocalProvider, RadioProvider, SelectionProvider, ToggleProvider, type MinMax } from "./state.client";
 
 export function LocalState({
   items,
@@ -439,6 +439,23 @@ export function LocalState({
   )
 }
 
+export function ToggleState({
+  items,
+  children,
+}: { items?: BaseProps[], children: React.ReactNode }) {
+  const initialState: Record<string, boolean> = {};
+  if(items) {
+    items.forEach(item => {
+      if(item.id) initialState[item.id] = item.initial || false;
+    });
+  }
+
+  return (
+    <ToggleProvider initialState={initialState}>
+      {children}
+    </ToggleProvider>
+  )
+}
 export function RadioState({
   items,
   children,

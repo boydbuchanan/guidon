@@ -54,7 +54,7 @@ export const STATE_MAP: Arrays<typeof STATE_KEYS> = {
   bool:    STATE_DEFAULT,
 };
 
-export const CONTAINER_KEYS = [
+export const CONTENT_KEYS = [
   'row', 'col', 
   'fit', 
   'left', 'right', 'center', // horizontal
@@ -62,7 +62,7 @@ export const CONTAINER_KEYS = [
   'start', 'origin', 'end', // wrap alignment
   'stretch', 'baseline', 
   'even', 'between', 'around'] as const;
-export type ContainerProps = StateTypeFlags & StyleProps & Flags<typeof CONTAINER_KEYS>;
+export type ContentProps = StateTypeFlags & StyleProps & Flags<typeof CONTENT_KEYS>;
 
 export const BUTTON_VARIANT_KEYS = ['hoverline', 'ghost', 'outline'] as const;
 export type ButtonVariantProps = Flags<typeof BUTTON_VARIANT_KEYS> & StyleProps

@@ -101,7 +101,7 @@ export function flexClasses(options?: FlexProps): string {
   const gapStyle = options.gap ? ( options.gap === true ? "gap" : `gap-${options.gap}`) : undefined;
   const padStyle = options.pad ? ( options.pad === true ? "pad" : `pad-${options.pad}`) : undefined;
   return cx(
-    options.mode || "row",
+    options.mode || "",
     options.horizontal,
     options.vertical,
     options.spacing,

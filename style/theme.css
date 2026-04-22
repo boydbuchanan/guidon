@@ -14,21 +14,13 @@ a:hover { color: var(--primary-dark); }
   background: var(--background);
   color: var(--foreground);
 }
-.menu {
-  background: var(--menu);
-  color: var(--menu-foreground);
-}
-.panel {
+.menu, .rail, .panel, .popover {
   background: var(--menu);
   color: var(--menu-foreground);
 }
 .card {
   background: var(--card);
   color: var(--card-foreground);
-}
-.rail {
-  background: var(--menu);
-  color: var(--menu-foreground);
 }
 .border {
   border: var(--border-style);

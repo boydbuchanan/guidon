@@ -22,7 +22,7 @@ export type StateProviderProps = {
 export const idStore = createStore(defaultState);
 
 const StateContext = createContext<IdState | null>(null);
-const ActionContext = createContext<IdActions>({ setValue: () => {}});
+const ActionContext = createContext<IdActions | null>(null);
 
 export type UpdateStrategy = (prev: IsTrueMap, id: string, value?: boolean) => IsTrueMap;
 export function useRootIdState() {
@@ -38,12 +38,20 @@ export function useRootIdState() {
   };
 }
 export function useLocalIdState() {
-  const state = useContext(StateContext) || useStore(idStore)
+  const localState = useContext(StateContext);
+  const globalState = useStore(idStore);
   const actions = useContext(ActionContext);
 
+  const globalSetValue = useCallback((id: string, value?: boolean) => {
+    idStore.setState(prev => ({
+      ...prev,
+      isTrue: defaultStrategy(prev.isTrue, id, value)
+    }));
+  }, []);
+
   return {
-    isTrue: state.isTrue,
-    ...actions
+    isTrue: (localState ?? globalState).isTrue,
+    setValue: actions?.setValue ?? globalSetValue,
   };
 }
 function StateProvider({ children, updateLogic, initialState = {} } 
@@ -73,12 +81,25 @@ function StateProvider({ children, updateLogic, initialState = {} }
   );
 }
 /**
- * Allows for multiple items to be true at once with no restrictions. This is the default provider if you just want simple toggle behavior.
+ * Allows for multiple items to be true at once with no restrictions.
  */
 export function LocalProvider({ ...props } : StateProviderProps) {
   return (
     <StateProvider {...props} 
       updateLogic={defaultStrategy}
+    />
+  );
+}
+
+/**
+ * Toggles the value of the given ID, allowing for multiple items to be true at once with no restrictions.
+ * @param {React.Context<IdContextValue | null>} Context - The context to use for this provider (default: LocalContext)
+ * @param {Record<string, boolean>} initialState - An object mapping IDs to their initial boolean state
+ */
+export function ToggleProvider({ ...props } : StateProviderProps) {
+  return (
+    <StateProvider {...props} 
+      updateLogic={toggleStrategy}
     />
   );
 }
@@ -115,7 +136,13 @@ export function SelectionProvider({ min, max, replace, ...props } : StateProvide
 /**
  * Toggles the boolean state of the given ID.
  */
-export const defaultStrategy: UpdateStrategy = (prev, id) => { 
+export const defaultStrategy: UpdateStrategy = (prev, id, value) => { 
+  return {
+    ...prev,
+    [id]: value ?? false,
+  };
+}
+export const toggleStrategy: UpdateStrategy = (prev, id) => { 
   return {
     ...prev,
     [id]: !prev[id],

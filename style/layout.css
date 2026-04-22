@@ -124,6 +124,9 @@ header.sticky {
   position: sticky;
   top: 0;
 }
+.anchor {
+  position: fixed;
+}
 
 .rail {
   position: fixed;
@@ -279,7 +282,6 @@ header.sticky {
   transition: opacity var(--transition-speed) ease;
 }
 .content[data-state='false'] { display: none; }
-
 .collapse { transition: height var(--transition-speed) ease-in-out, opacity var(--transition-speed); }
 .collapse[data-state='closed'] { height: 0; overflow: hidden; }
 
@@ -350,8 +352,7 @@ header.sticky {
 }
 .row {display: flex; flex-direction: row; flex-wrap: nowrap}
 .col {display: flex; flex-direction: column; flex-wrap: nowrap}
-.row.fit { width: fit-content;}
-.col.fit { height: fit-content;}
+.fit { width: fit-content; height: fit-content;}
 .row.top { align-items: flex-start; }
 .col.top { justify-content: flex-start; }
 .row.bottom { align-items: flex-end; }
