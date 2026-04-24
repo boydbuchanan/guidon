@@ -10,6 +10,10 @@ a {
 
 a:hover { color: var(--primary-dark); }
 
+/*==========================================
+  THEME STRUCTURE
+  ========================================== */
+
 .base {
   background: var(--background);
   color: var(--foreground);
@@ -22,33 +26,78 @@ a:hover { color: var(--primary-dark); }
   background: var(--card);
   color: var(--card-foreground);
 }
-.border {
-  border: var(--border-style);
-}
-.border-2 { border: 2px solid var(--border); }
+.border { border: 1px solid var(--item-border); }
+.border-2 { border: 2px solid var(--item-border); }
 .borderchild > * { border: var(--border-style); }
 
-.primary { background: var(--primary); color: var(--primary-foreground); }
-.secondary { background: var(--secondary); color: var(--secondary-foreground); }
-.accent { border-color: transparent; background: var(--primary-ghost); color: var(--primary-dark); }
-.destructive { background: var(--destructive); color: var(--destructive-foreground); }
-.muted { background: var(--muted); color: var(--muted-foreground); }
-.inactive { background: transparent; color: var(--muted-dark); }
+/*==========================================
+  THEME VARIABLES
+  ========================================== */
 
-button.ghost { border-color: transparent; background: transparent; color: var(--button-color); }
-button.ghost:hover { border-color: transparent; background: color-mix(in oklch, var(--button-color), transparent 80%); color: var(--button-color); }
-button.outline { border: var(--border-style); border-color: var(--button-color); background: transparent; color: var(--button-color);}
-button.outline:hover { background: var( --button-ghost); }
+.primary {
+  --item-color:  var(--primary);
+  --item-fg:     var(--primary-foreground);
+  --item-light:  var(--primary-light);
+  --item-dark:   var(--primary-dark);
+  --item-border: var(--primary);
+  --item-ghost:  var(--primary-ghost);
+  z-index: var(--z-priority);
+}
+.secondary {
+  --item-color:  var(--secondary);
+  --item-fg:     var(--secondary-foreground);
+  --item-light:  var(--secondary-light);
+  --item-dark:   var(--secondary-dark);
+  --item-border: var(--secondary);
+  --item-ghost:  var(--secondary-ghost);
+}
+.accent {
+  --item-color:  var(--accent);
+  --item-fg:     var(--accent-foreground);
+  --item-light:  var(--accent-light);
+  --item-dark:   var(--accent-dark);
+  --item-border: var(--accent);
+  --item-ghost:  var(--accent-ghost);
+}
+.destructive {
+  --item-color:  var(--destructive);
+  --item-fg:     var(--destructive-foreground);
+  --item-light:  var(--destructive-light);
+  --item-dark:   var(--destructive-dark);
+  --item-border: var(--destructive);
+  --item-ghost:  var(--destructive-ghost);
+}
+.muted {
+  --item-color:  var(--muted-foreground);
+  --item-fg:     var(--muted-foreground);
+  --item-light:  var(--muted);
+  --item-dark:   var(--muted-dark);
+  --item-border: var(--muted);
+  --item-ghost:  color-mix(in oklch, var(--muted), transparent 80%);
+}
+.inactive {
+  --item-color:  var(--muted-dark);
+  --item-fg:     var(--muted-dark);
+  --item-border: var(--muted);
+  --item-ghost:  transparent;
+}
 
-button.hoverline { border-color: transparent; border: var(--border-style); background: color-mix(in oklch, var(--button-color), transparent 95%); color: var(--button-dark);}
-button.hoverline:hover { border-color: var(--button-color); color: var(--button-dark);}
+/*==========================================
+  THEME PROPERTIES
+  ========================================== */
 
-.text.primary { background:initial; color: var(--primary); }
-.text.secondary { background: initial; color: var(--secondary); }
-.text.accent { border-color: initial; background: initial; color: var(--accent); }
-.text.destructive { background: initial; color: var(--destructive); }
-.text.muted { background: initial; color: var(--muted-foreground); }
-.text.inactive { background: initial; color: var(--muted); }
+/* Filled */
+.primary, .secondary, .destructive { background: var(--item-color); color: var(--item-fg); }
+.muted    { background: var(--item-light); color: var(--item-fg); }
+.accent   { background: var(--item-fg); color: var(--item-color); }
+.inactive { background: transparent; color: var(--item-fg); }
+
+/* Text-only */
+.text { background: initial; color: var(--item-color); }
+
+/*==========================================
+  FORM ELEMENTS
+  ========================================== */
 
 .disabled { cursor: not-allowed; opacity: 0.6; pointer-events: none; }
 
@@ -60,33 +109,57 @@ input {
 input:focus {
   box-shadow: 0 0 2px 1px var(--primary);
 }
+.sunken { box-shadow: inset 0 1px 6px rgba(0,0,0,0.3); }
+.raised { box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 header {
   border-bottom: 1px solid var(--border);
 }
 
+/* ==========================================
+   BUTTON BASE & MODES
+   ========================================== */
+
 button {
-  --button-color: var(--foreground);
-  --button-foreground: var(--background);
+  --item-color:  var(--foreground);
+  --item-fg:     var(--background);
+  --item-light:  var(--muted);
+  --item-dark:   var(--muted-foreground);
+  --item-border: var(--border);
+  --item-ghost:  color-mix(in oklch, var(--item-color), transparent 95%);
   --button-hover: 90%;
-  --button-ghost: color-mix(in oklch, var(--button-color), transparent 95%);
   background: transparent;
-  color: var(--button-color);
-  /* border: var(--border-style); */
+  color: var(--item-color);
 }
-button:hover { background: color-mix(in oklch, var(--button-color), transparent var(--button-hover)); z-index: 10; }
-button.primary { --button-color: var(--primary); --button-foreground: var(--primary-foreground); --button-light: var(--primary-light); --button-dark: var(--primary-dark); --button-border: var(--primary); --button-hover: 30%;}
-button.secondary { --button-color: var(--secondary); --button-foreground: var(--secondary-foreground); --button-light: var(--secondary-light); --button-dark: var(--secondary-dark); --button-border: var(--secondary); --button-hover: 30%; }
-button.accent { --button-color: var(--accent); --button-foreground: var(--accent-foreground); --button-light: var(--accent); --button-dark: var(--accent); --button-border: var(--accent); }
-button.muted { --button-color: var(--muted-foreground); --button-foreground: var(--muted); --button-light: var(--muted); --button-dark: var(--muted-foreground); --button-border: var(--muted); z-index: var(--z-inactive); }
-button.muted:hover { z-index: var(--z-focus) }
+button:hover { background: color-mix(in oklch, var(--item-color), transparent var(--button-hover)); z-index: 10; }
 
-button.background { --button-color: var(--background); --button-foreground: var(--foreground); --button-light: var(--muted); --button-dark: var(--muted-foreground); --button-border: var(--muted); }
+/* Button variant overrides — only what differs from the shared variant class */
+button.primary   { --button-hover: 30%; }
+button.secondary { --button-hover: 30%; }
+button.muted     { z-index: var(--z-inactive); }
+button.muted:hover { z-index: var(--z-focus); }
 
+button.background {
+  --item-color:  var(--background);
+  --item-fg:     var(--foreground);
+  --item-light:  var(--muted);
+  --item-dark:   var(--muted-foreground);
+  --item-border: var(--muted);
+}
+
+/* Button modes */
+.ghost       { border-color: transparent; background: transparent; color: var(--item-color); }
+.ghost:hover { border-color: transparent; background: color-mix(in oklch, var(--item-color), transparent 80%); color: var(--item-color); }
+.outline       { border: var(--border-style); border-color: var(--item-border); background: transparent; color: var(--item-color); }
+.outline:hover { background: var(--item-ghost); }
+
+.hoverline       { border-color: transparent; border: var(--border-style); background: color-mix(in oklch, var(--item-color), transparent 95%); color: var(--item-dark); }
+.hoverline:hover { border-color: var(--item-color); color: var(--item-dark); }
+
+/* Button data-state */
 button[data-state='inactive']:hover { background: var(--muted); color: var(--primary-light); }
-button[data-state='active'] { background: var(--primary); color: white; }
-
-button[data-state='false'] { background: transparent; color: var(--button-dark) }
-button[data-state='true'] { background: var(--button-color); color: var(--button-foreground); }
+button[data-state='active']         { background: var(--primary); color: white; }
+button[data-state='false'] { background: transparent; color: var(--item-dark); }
+button[data-state='true']  { background: var(--item-color); color: var(--item-fg); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
 
 ::-webkit-scrollbar {

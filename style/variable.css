@@ -69,9 +69,15 @@
 
   --accent: var(--accent-hex);
   --accent-foreground: var(--accent-foreground-hex);
-  
+  --accent-light: oklch(from var(--accent-hex) 0.65 c h);
+  --accent-dark:  oklch(from var(--accent-hex) 0.35 c h);
+  --accent-ghost: color-mix(in oklch, var(--accent), transparent 80%);
+
   --destructive: oklch(from var(--destructive-hex) l c h);
   --destructive-foreground: oklch(from var(--destructive-hex) 0.15 c h);
+  --destructive-light: oklch(from var(--destructive-hex) 0.6 c h);
+  --destructive-dark:  oklch(from var(--destructive-hex) 0.3 c h);
+  --destructive-ghost: color-mix(in oklch, var(--destructive), transparent 80%);
 
   --highlight-1: var(--highlight-1-hex);
   --highlight-2: var(--highlight-2-hex);

@@ -63,16 +63,16 @@ export function StateButton({
   );
 }
 
-export function CheckButton({children, ...props}: React.ComponentProps<typeof StateButton>) {
+export function CheckButton({children, ...props}: React.ComponentProps<typeof Button>) {
   const { isTrue } = useLocalIdState();
   const Icon = isTrue[props.id || ''] ? SquareCheckIcon : SquareIcon;
 
   return (
-    <StateButton {...props}>
+    <Button {...props}>
       {children || (
         <Icon />
       )}
-    </StateButton>
+    </Button>
   );
 }
 
