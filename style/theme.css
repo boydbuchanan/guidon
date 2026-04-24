@@ -26,6 +26,7 @@ a:hover { color: var(--primary-dark); }
   border: var(--border-style);
 }
 .border-2 { border: 2px solid var(--border); }
+.borderchild > * { border: var(--border-style); }
 
 .primary { background: var(--primary); color: var(--primary-foreground); }
 .secondary { background: var(--secondary); color: var(--secondary-foreground); }
@@ -33,6 +34,14 @@ a:hover { color: var(--primary-dark); }
 .destructive { background: var(--destructive); color: var(--destructive-foreground); }
 .muted { background: var(--muted); color: var(--muted-foreground); }
 .inactive { background: transparent; color: var(--muted-dark); }
+
+button.ghost { border-color: transparent; background: transparent; color: var(--button-color); }
+button.ghost:hover { border-color: transparent; background: color-mix(in oklch, var(--button-color), transparent 80%); color: var(--button-color); }
+button.outline { border: var(--border-style); border-color: var(--button-color); background: transparent; color: var(--button-color);}
+button.outline:hover { background: var( --button-ghost); }
+
+button.hoverline { border-color: transparent; border: var(--border-style); background: color-mix(in oklch, var(--button-color), transparent 95%); color: var(--button-dark);}
+button.hoverline:hover { border-color: var(--button-color); color: var(--button-dark);}
 
 .text.primary { background:initial; color: var(--primary); }
 .text.secondary { background: initial; color: var(--secondary); }
@@ -78,14 +87,6 @@ button[data-state='active'] { background: var(--primary); color: white; }
 
 button[data-state='false'] { background: transparent; color: var(--button-dark) }
 button[data-state='true'] { background: var(--button-color); color: var(--button-foreground); }
-
-button.ghost { border-color: transparent; background: var(--border); color: var(--button-color); }
-button.ghost:hover { border-color: transparent; background: color-mix(in oklch, var(--button-color), transparent 80%); color: var(--button-color); }
-button.outline { border: var(--border-style); border-color: var(--button-color); background: transparent; color: var(--button-color);}
-button.outline:hover { background: var( --button-ghost); }
-
-button.hoverline { border-color: transparent; border: var(--border-style); background: color-mix(in oklch, var(--button-color), transparent 95%); color: var(--button-dark);}
-button.hoverline:hover { border-color: var(--button-color); color: var(--button-dark);}
 
 
 ::-webkit-scrollbar {

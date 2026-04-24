@@ -1,5 +1,22 @@
 import React from "react";
 
+export function useOutsideClick<T extends HTMLElement>(callback: () => void, active = true) {
+  const ref = React.useRef<T>(null);
+
+  React.useEffect(() => {
+    if (!active) return;
+    const handleClick = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        callback();
+      }
+    };
+    document.addEventListener('mousedown', handleClick, true);
+    return () => document.removeEventListener('mousedown', handleClick, true);
+  }, [callback, active]);
+
+  return ref;
+}
+
 export function useKeyPress(onKey: () => void, keys: string[], active: boolean) {
   React.useEffect(() => {
     if (!active) return; // Don't add the listener if backdrop is hidden
@@ -54,4 +71,53 @@ export function usePortal(id:string = "default-portal") {
   }, [id]);
 
   return wrapperElement;
+}
+export function useTheme() {
+  const [themeValue, setThemeValue] = React.useState(document.documentElement.dataset.theme || 'light');
+
+  React.useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setThemeValue(document.documentElement.dataset.theme || 'light');
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+
+  return themeValue;
+}
+
+export function useCopyToClipboard({
+  timeout = 2000,
+  onCopy,
+}: {
+  timeout?: number
+  onCopy?: () => void
+} = {}) {
+  const [isCopied, setIsCopied] = React.useState(false)
+
+  const copyToClipboard = async (value: string) => {
+    if (typeof window === "undefined" || !value) return false
+
+    let hasCopied = false
+
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value)
+      hasCopied = true
+    }
+
+    if (!hasCopied) {
+      return false
+    }
+
+    setIsCopied(true)
+    onCopy?.()
+
+    if (timeout !== 0) {
+      setTimeout(() => {setIsCopied(false)}, timeout)
+    }
+
+    return true
+  }
+
+  return { isCopied, copyToClipboard }
 }

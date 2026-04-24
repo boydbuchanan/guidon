@@ -59,28 +59,6 @@ Fluid Space Variables
   --space-s-l: clamp(1.125rem, 0.5625rem + 2.5vw, 2.5rem);
 }
 
-/*
-@link https://utopia.fyi/grid/calculator?c=360,18,1.2,1240,20,1.25,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12
-Fluid Grid Variables
-*/
-
-:root {
-  --grid-max-width: 77.50rem;
-  --grid-gutter: var(--space-s-l, clamp(1.125rem, 0.5625rem + 2.5vw, 2.5rem));
-  --grid-columns: 12;
-}
-
-.u-container {
-  max-width: var(--grid-max-width);
-  padding-inline: var(--grid-gutter);
-  margin-inline: auto;
-}
-
-.u-grid {
-  display: grid;
-  gap: var(--grid-gutter);
-}
-
 body {
   font-size: var(--step-0);
   line-height: 1.5; /* Unitless line-height for vertical rhythm */

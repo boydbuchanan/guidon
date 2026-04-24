@@ -1,6 +1,6 @@
 import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
-import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, type BaseProps, type ButtonVariantProps, type ContentProps, type Flags, type RailLayoutFlags, type StyleProps } from "./types";
-import { pluck, split, toClassNames, cx, flagClass, flagsToString } from "./utils";
+import { ANCHOR_KEYS, BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, type AnchorProps, type BaseProps, type ButtonVariantProps, type ContentProps, type Flags, type RailLayoutFlags, type StateTypeFlags, type StyleProps } from "./types";
+import { pluck, split, toClassNames, cx, flagClass } from "./utils";
 
 /**
  * Container component for layout.
@@ -11,56 +11,96 @@ import { pluck, split, toClassNames, cx, flagClass, flagsToString } from "./util
 export function Content({
   as: Component = "div", // Default to div
   className = 'content',
+  anchorId,
+  anchorTo,
+  anchorPoint,
+  targetPoint,
+  style,
   ...props
-}: React.ComponentProps<typeof StateContent> & ContentProps) {
+}: React.ComponentProps<typeof StateContent> & ContentProps & AnchorProps) {
   const [, base] = pluck(props, STATE_KEYS);
   const { flags, rest, flex, theme } = split(base, CONTENT_KEYS);
   if(props.debug)
     console.log("Content props: ", { flags, flex, theme });
 
-  // Shortcuts to setting flex properties based on flags
-  if(flags.col || flags.row) {
-    if(flags.col) flex.mode = 'col';
-    else if(flags.row) flex.mode = 'row';
-  }
-  if(flags.left || flags.right || flags.center) {
-    if(flags.center) flex.horizontal = 'center';
-    else if(flags.left) flex.horizontal = 'left';
-    else if(flags.right) flex.horizontal = 'right';
-  }
-  if(flags.top || flags.bottom || flags.middle) {
-    if(flags.middle) flex.vertical = 'middle';
-    else if(flags.top) flex.vertical = 'top';
-    else if(flags.bottom) flex.vertical = 'bottom';
-  }
-  if(flags.even || flags.between || flags.around) {
-    if(flags.even) flex.spacing = 'even';
-    else if(flags.between) flex.spacing = 'between';
-    else if(flags.around) flex.spacing = 'around';
-  }
   // Flags and Flex will generate duplicate properties but CX will deduplicate
   const baseClasses = toClassNames({ flags, rest, flex, theme });
   if(props.debug)
     console.log("Base Classes: ", baseClasses);
+  
+  const styleProps: React.CSSProperties = {
+    ...style,
+  };
+  if(anchorId){
+    styleProps.anchorName = `--anchor-${anchorId}`;
+  }
+  if(anchorTo){
+    const anchorStyle = getAnchorStyle(anchorTo, anchorPoint, targetPoint);
+    Object.assign(styleProps, anchorStyle);
+  }
 
   if(props.id){
     
     var stateType = STATE_KEYS.find(type => props[type] === true);
     const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
 
-    return <StateContent trueState={on} falseState={off} className={cx(baseClasses, stateType, className)} style={{ anchorName: `--anchor-${props.id}` }} {...rest}  />
+    return <StateContent trueState={on} falseState={off} className={cx(baseClasses, stateType, className)} style={styleProps} {...rest}  />
   }
-  return <Component className={cx(baseClasses, className)} {...rest} />
+  return <Component className={cx(baseClasses, className)} style={styleProps} {...rest} />
 };
+
+/**
+ * Button component for actions. Renders a button element with various styling options based on props.
+ * Supports variants like 'ghost', 'outline', 'light', 'dark', and 'link' through boolean props.
+ * Also supports theme and flex styling through the base utility props.
+ * Matches .button css class, with additional classes based on variants and state.
+ */
+export function Button({
+  anchorId,
+  className,
+  style,
+  ...props
+}: React.ComponentProps<typeof StateButton> & StateTypeFlags & ButtonVariantProps & { anchorId?: string }) {
+  // Split out button-specific keys + base framework keys
+  const { flags, rest, ...base } = split(props, BUTTON_VARIANT_KEYS);
+  
+  // 'extra' contains ghost, outline, etc.
+  const buttonVariant = flagClass(flags, BUTTON_VARIANT_KEYS);
+  
+  // 'base' contains the theme, flex, and style objects for the master utility
+  const baseClasses = toClassNames({ flags, rest, ...base });
+  
+  const styleProps: React.CSSProperties = {
+    ...style,
+  };
+  if(anchorId){
+    styleProps.anchorName = `--anchor-${anchorId}`;
+  }
+
+  if(props.id){
+    var stateType = STATE_KEYS.find(type => props[type] === true);
+    const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
+    return <StateButton trueState={on} falseState={off} className={cx(buttonVariant, baseClasses, stateType, className)} style={styleProps} {...rest}/>
+  }
+
+  return (
+    <button className={cx('button', buttonVariant, baseClasses, className)}  style={styleProps} {...rest}/>
+  );
+}
+
 
 /**
  * Text component for typography. Renders a span by default, but can render any component specified by the 'as' prop.
  * Should be used with h1-h6, p, or other text elements to ensure semantic HTML.
  * Matches .text css class.
  */
-export function Text({as = "span",className,...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType }) {
+export function Text({as = "span", className, ...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType }) {
   const Component = (as) as React.ElementType;
   return <Component className={cx('text', className)} {...props} />
+}
+
+export function Link({className, ...props}: React.ComponentProps<"a"> ) {
+  return <a className={cx('text link', className)} {...props} />
 }
 
 export interface SvgIconProps extends React.ComponentPropsWithoutRef<'svg'> {
@@ -97,30 +137,6 @@ export function SvgIcon({
       {d ? <path d={d} {...pathProps} /> : null}
       {children}
     </svg>
-  );
-}
-
-/**
- * Button component for actions. Renders a button element with various styling options based on props.
- * Supports variants like 'ghost', 'outline', 'light', 'dark', and 'link' through boolean props.
- * Also supports theme and flex styling through the base utility props.
- * Matches .button css class, with additional classes based on variants and state.
- */
-export function Button({
-  className,
-  ...props
-}: React.ComponentProps<"button"> & ButtonVariantProps) {
-  // Split out button-specific keys + base framework keys
-  const { flags, rest, ...base } = split(props, BUTTON_VARIANT_KEYS);
-  
-  // 'extra' contains ghost, outline, etc.
-  const buttonVariant = flagClass(flags, BUTTON_VARIANT_KEYS);
-  
-  // 'base' contains the theme, flex, and style objects for the master utility
-  const baseClasses = toClassNames({ flags, rest, ...base });
-
-  return (
-    <button className={cx('button', buttonVariant, baseClasses, className)} {...rest} />
   );
 }
 
@@ -168,25 +184,34 @@ export function Container({
 }: React.ComponentProps<typeof Content>) {
   return <Content className={cx('container', className)} col={row ? false : true} row={row ? true : false} {...props}/>
 };
+export function Grid({
+  cols,
+  style,
+  ...props
+}: React.ComponentProps<typeof Content> & { cols?: number }) {
+  const gridStyle: React.CSSProperties = {
+    ...(cols && { gridTemplateColumns: `repeat(${cols}, 1fr)`, gridAutoRows: '1fr' }),
+    ...style,
+  };
+  return <Content {...props} grid row={false} col={false} style={gridStyle} />
+};
 /**
  * Default Content component for layout. Renders a flex container with column layout.
  * @returns {JSX.Element} A React component that renders a flex container with the specified layout and children.
  */
 export function Col({
-  className,
   ...props
 }: React.ComponentProps<typeof Container>) {
-  return <Content col row={false} {...props}/>
+  return <Content {...props} col row={false}/>
 }
 /**
  * Default Content component for layout. Renders a flex container with row layout.
  * @returns {JSX.Element} A React component that renders a flex container with the specified layout and children.
  */
 export function Row({
-  className,
   ...props
 }: React.ComponentProps<typeof Container>) {
-  return <Content row col={false} {...props}/>
+  return <Content {...props} row col={false}/>
 };
 export const PANEL_KEYS = ['left', 'right', 'top', 'bottom', 'center'] as const;
 export type PanelFlags = Flags<typeof PANEL_KEYS>;
@@ -205,7 +230,7 @@ export function Panel({
   var side = PANEL_KEYS.find(type => flags[type] === true);
   
   return (
-    <Container 
+    <Content 
       as={Component}
       className={cx(`panel`, className)}
       data-side={side}
@@ -213,7 +238,7 @@ export function Panel({
       {...rest}
       >
       {children}
-    </Container>
+    </Content>
   );
 };
 /**
@@ -248,7 +273,7 @@ export const SheetButton = CloseButton;
 
 export function ModalPanel({className, ...props}: PanelProps & React.ComponentProps<typeof Panel>) {
   return (
-    <Portal {...props}>
+    <Portal>
       <Backdrop {...props} />
       <Panel as='section' className={cx(`modal`, className)} center show {...props}/>
     </Portal>
@@ -301,7 +326,7 @@ export function RailContent({
 
   return (
     <Portal id={'rail-root'}>
-      <Panel slide {...props}>
+      <Panel slide className={cx('rail', className)} {...props}>
         <CloseHeader {...base}>
           {label}
         </CloseHeader>
@@ -313,16 +338,16 @@ export function RailContent({
   );
 };
 
-export function ActiveButton({...props}: React.ComponentProps<typeof StateButton>) {
-  return <StateButton trueState='active' falseState='inactive' {...props}/>
+export function ActiveButton({...props}: React.ComponentProps<typeof Button>) {
+  return <Button trueState='active' falseState='inactive' {...props}/>
 }
 
-export function OpenButton({...props}: React.ComponentProps<typeof StateButton>) {
-  return <StateButton trueState='open' falseState='closed' {...props}/>
+export function OpenButton({...props}: React.ComponentProps<typeof Button>) {
+  return <Button trueState='open' falseState='closed' {...props}/>
 }
 
-export function ShowButton({...props}: React.ComponentProps<typeof StateButton>) {
-  return <StateButton trueState='show' falseState='hide' {...props}/>
+export function ShowButton({...props}: React.ComponentProps<typeof Button>) {
+  return <Button trueState='show' falseState='hide' {...props}/>
 }
 
 export function ChevronButton({
@@ -330,14 +355,14 @@ export function ChevronButton({
   ...props
 }: React.ComponentProps<typeof StateButton>) {
   return (
-    <StateButton
+    <Button
       trueState='open'
       falseState='closed'
       {...props}
     >
       {children}
       <ChevronDown className='open-rotate' size={16} />
-    </StateButton>
+    </Button>
   );
 }
 
@@ -349,7 +374,7 @@ export function CloseHeader({
   return (
     <header {...rest}>
       <Text as='h6' className={`semibold`}>{children}</Text>
-      <CloseButton {...base} />
+      <CloseButton ghost  {...base} />
     </header>
   );
 };
@@ -359,11 +384,11 @@ export function CloseButton({
   ...props
 }: React.ComponentProps<typeof Button> & BaseProps) {
   return (
-    <StateButton {...props}>
+    <Button {...props}>
       {children || (
         <XIcon />
       )}
-    </StateButton>
+    </Button>
   );
 }
 
@@ -421,6 +446,7 @@ export function SquareCheckIcon({ ...props }: SvgIconProps) {
   )
 }
 import { LocalProvider, RadioProvider, SelectionProvider, ToggleProvider, type MinMax } from "./state.client";
+import { getAnchorStyle } from "./dev";
 
 export function LocalState({
   items,

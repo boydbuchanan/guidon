@@ -35,8 +35,9 @@ export function StateButton({
   id,
   trueState: trueValue = 'true',
   falseState: falseValue = 'false',
+  onClick,
   ...props
-}: React.ComponentProps<typeof Button> & BaseProps) {
+}: React.ComponentProps<"button"> & BaseProps) {
   const { isTrue, setValue } = useLocalIdState();
 
   const [flags, rest] = pluck(props, BASE_KEYS);
@@ -44,17 +45,21 @@ export function StateButton({
   if(props.debug){
     console.log("StateButton props: ", flags, rest);
   }
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (id) setValue(id, !isTrue[id]);
+    if(onClick) onClick(event);
+  }
 
   return (
-    <Button
+    <button
       id={id}
-      onClick={() => id && setValue(id, !isTrue[id])}
+      onClick={handleClick}
       data-id={id}
       data-state={id ? (isTrue[id] ? trueValue : falseValue) : 'none'}
       {...rest}
     >
       {children}
-    </Button>
+    </button>
   );
 }
 
@@ -90,7 +95,7 @@ export function Backdrop({
 
   return (
     <div
-      onClick={() =>  setValue(id, false)}
+      onClick={handleClose}
       className={`backdrop`}
       id={id}
       style={{ opacity: isTrue[id] ? 1 : 0, pointerEvents: isTrue[id] ? 'auto' : 'none' }}

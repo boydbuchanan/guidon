@@ -55,8 +55,8 @@ export const STATE_MAP: Arrays<typeof STATE_KEYS> = {
 };
 
 export const CONTENT_KEYS = [
-  'row', 'col', 
-  'fit', 
+  'row', 'col', 'grid',
+  'fit', 'border', 'borderchild',
   'left', 'right', 'center', // horizontal
   'top', 'middle', 'bottom',  // vertical
   'start', 'origin', 'end', // wrap alignment
@@ -69,3 +69,11 @@ export type ButtonVariantProps = Flags<typeof BUTTON_VARIANT_KEYS> & StyleProps
 
 export const RAIL_LAYOUT_KEYS = ['left', 'right'] as const;
 export type RailLayoutFlags = Flags<typeof RAIL_LAYOUT_KEYS>;
+
+export type AnchorPoint =
+  | 'top-left'    | 'top-right'    | 'top-center'    | 'top'
+  | 'bottom-left' | 'bottom-right' | 'bottom-center' | 'bottom'
+  | 'center-left' | 'center-right' | 'center-center' | 'center'
+  | 'left'        | 'right';
+export const ANCHOR_KEYS = ['anchorId', 'anchorTo', 'anchorPoint', 'targetPoint'] as const;
+export type AnchorProps = { anchorId?: string, anchorTo?: string, anchorPoint?: AnchorPoint, targetPoint?: AnchorPoint }

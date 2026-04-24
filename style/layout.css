@@ -22,8 +22,8 @@
   --z-inactive: 5;
   --z-default: 10;
   --z-focus: 15;
-  --z-header: 20;
-  --z-menu: 30;
+  --z-menu: 20;
+  --z-header: 30;
   --z-rail: 35;
   --z-modal: 40;
 
@@ -126,6 +126,7 @@ header.sticky {
 }
 .anchor {
   position: fixed;
+  z-index: var(--z-menu);
 }
 
 .rail {
@@ -139,6 +140,9 @@ header.sticky {
   flex-shrink: 0;
   flex-direction: column;
   align-items: center;
+  z-index: var(--z-rail);
+}
+.rail.panel {
   z-index: var(--z-rail);
 }
 
@@ -175,7 +179,7 @@ header.sticky {
   box-shadow: 4px 0 15px -3px rgb(0 0 0 / 0.1);
 }
 
-.rail-left .panel, .rail-right .panel {
+.rail-left .rail.panel, .rail-right .rail.panel {
   width: var(--panel-width);
 }
 .rail-left main, .rail-left .panel[data-side="left"] {
@@ -219,6 +223,7 @@ header.sticky {
   :is(.rail-left main, .rail-left .panel[data-side="left"], .rail-right main, .rail-right .panel[data-side="right"]) {
     margin-left: unset;
     margin-right: unset;
+    margin-bottom: var(--bottom-rail-height)
   }
   .rail .logo {
     left: var(--space-2xs);
@@ -344,22 +349,25 @@ header.sticky {
   padding: var(--container-padding);
   overflow-y: auto;
 }
-
+.fit { width: fit-content; height: fit-content;}
 .center:not(.row, .col) {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
+.grid {display: grid;}
+.grid.square > * {aspect-ratio: 1 / 1; width: 100%;}
+
 .row {display: flex; flex-direction: row; flex-wrap: nowrap}
 .col {display: flex; flex-direction: column; flex-wrap: nowrap}
-.fit { width: fit-content; height: fit-content;}
+
 .row.top { align-items: flex-start; }
 .col.top { justify-content: flex-start; }
 .row.bottom { align-items: flex-end; }
 .col.bottom { justify-content: flex-end; }
 .row.middle { align-items: center; }
 .col.middle { justify-content: center; }
-
 
 .row.left { justify-content: flex-start; }
 .col.left { align-items: flex-start; }
@@ -391,7 +399,6 @@ header.sticky {
 .row .basis-3, .col .basis-3 { flex-basis: 33.333%; }
 .row .basis-4, .col .basis-4 { flex-basis: 25%; }
 
-/* The Container */
 .joined {
   display: inline-flex;
   width: fit-content;
