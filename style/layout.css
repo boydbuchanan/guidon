@@ -431,12 +431,12 @@ header.sticky {
 .row.center { justify-content: center; }
 .col.center { align-items: center; }
 
-.col.stretch:not(.left,  .center,  .right), .row.stretch:not(.top,  .middle, .bottom) { align-items: stretch; }
-.col.baseline:not(.left, .center,  .right), .row.baseline:not(.top, .middle, .bottom){ align-items: center; }
+.col.stretch:not(.left, .center, .right), .row.stretch:not(.top, .middle, .bottom) { align-items: stretch; }
+.col.baseline:not(.left, .center, .right), .row.baseline:not(.top, .middle, .bottom) { align-items: center; }
 
-.col.between:not(.top, .middle, .bottom), .row.between:not(.left, .center,  .right) { justify-content: space-between; }
-.col.around:not(.top, .middle, .bottom), .row.around:not(.left, .center,  .right) { justify-content: space-around; }
-.col.even:not(.top, .middle, .bottom), .row.even:not(.left, .center,  .right) { justify-content: space-evenly; }
+.col.between:not(.top, .middle, .bottom), .row.between:not(.left, .center, .right) { justify-content: space-between; }
+.col.around:not(.top, .middle, .bottom), .row.around:not(.left, .center, .right) { justify-content: space-around; }
+.col.even:not(.top, .middle, .bottom), .row.even:not(.left, .center, .right) { justify-content: space-evenly; }
 
 .col.nowrap, .row.nowrap { flex-wrap: nowrap; }
 
@@ -453,6 +453,11 @@ header.sticky {
 .row .basis-2, .col .basis-2 { flex-basis: 50%; }
 .row .basis-3, .col .basis-3 { flex-basis: 33.333%; }
 .row .basis-4, .col .basis-4 { flex-basis: 25%; }
+
+.row .width-75, .col .width-75 { width: 75%; }
+.row .width-67, .col .width-67 { width: 66.666%; }
+.row .width-50, .col .width-50 { width: 50%; }
+
 
 .joined {
   display: inline-flex;
