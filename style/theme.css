@@ -22,6 +22,9 @@ a:hover { color: var(--primary-dark); }
   background: var(--menu);
   color: var(--menu-foreground);
 }
+header.menu {
+  border-bottom: 1px solid var(--border);
+}
 .card {
   background: var(--card);
   color: var(--card-foreground);
@@ -111,9 +114,6 @@ input:focus {
 }
 .sunken { box-shadow: inset 0 1px 6px rgba(0,0,0,0.3); }
 .raised { box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-header {
-  border-bottom: 1px solid var(--border);
-}
 
 /* ==========================================
    BUTTON BASE & MODES

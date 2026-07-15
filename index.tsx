@@ -1,5 +1,6 @@
 import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
-import { ANCHOR_KEYS, BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, type AnchorProps, type BaseProps, type ButtonVariantProps, type ContentProps, type Flags, type RailLayoutFlags, type StateTypeFlags, type StyleProps } from "./types";
+import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP } from "./types";
+import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, Flags, RailLayoutFlags, StateTypeFlags } from "./types";
 import { pluck, split, toClassNames, cx, flagClass } from "./utils";
 
 /**
@@ -250,10 +251,9 @@ export function Sheet({ children }: React.PropsWithChildren) {
 }
 
 export function SheetPanel({className, ...props}: React.ComponentProps<typeof Panel>) {
-  const [base] = pluck(props, BASE_KEYS);
   return (
-    <Portal {...base}>
-      <Backdrop {...base} />
+    <Portal>
+      <Backdrop {...props} />
       <Panel as='section' className={cx(`sheet`, className)} slide {...props}/>
     </Portal>
   );
@@ -355,14 +355,14 @@ export function ChevronButton({
   ...props
 }: React.ComponentProps<typeof StateButton>) {
   return (
-    <Button
+    <OpenButton
       trueState='open'
       falseState='closed'
       {...props}
     >
       {children}
       <ChevronDown className='open-rotate' size={16} />
-    </Button>
+    </OpenButton>
   );
 }
 

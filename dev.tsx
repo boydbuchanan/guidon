@@ -1,5 +1,5 @@
 import { Content } from ".";
-import { cx, pluck } from "./utils";
+import { cx } from "./utils";
 import { useLocalIdState } from "./state.client";
 import React from "react";
 import { useKeyPress, useOutsideClick } from "./hooks";

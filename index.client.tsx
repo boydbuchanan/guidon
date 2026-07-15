@@ -1,6 +1,6 @@
 "use client"
 import React from "react";
-import { Text, Button, ChevronDown, SquareCheckIcon, SquareIcon, XIcon } from ".";
+import { Button, SquareCheckIcon, SquareIcon } from ".";
 
 import { pluck } from "./utils";
 import { createPortal } from "react-dom";
@@ -17,7 +17,7 @@ export function StateContent({
   ...props
 }: { as?: React.ElementType } & React.ComponentProps<"div"> & BaseProps) {
   const { isTrue } = useLocalIdState();
-  const [flags, rest] = pluck(props, BASE_KEYS);
+  const [, rest] = pluck(props, BASE_KEYS);
   return (
     <Component
       id={id}
@@ -81,7 +81,7 @@ export function Backdrop({
   id,
   ...props
 }: React.ComponentProps<"div"> & BaseProps) {
-  const [base, rest] = pluck(props, BASE_KEYS);
+  const [, rest] = pluck(props, BASE_KEYS);
   
   const { isTrue, setValue } = useLocalIdState();
   const isActive = id ? isTrue[id] : false;
