@@ -31,6 +31,8 @@ export type FlexProps = {
   baseline?: boolean;
   gap?: number | boolean;
   pad?: number | boolean;
+  basis?: number | boolean;
+  width?: number | boolean;
 }
 export const flexProps: FlexProps = {};
 
@@ -77,3 +79,7 @@ export type AnchorPoint =
   | 'left'        | 'right';
 export const ANCHOR_KEYS = ['anchorId', 'anchorTo', 'anchorPoint', 'targetPoint'] as const;
 export type AnchorProps = { anchorId?: string, anchorTo?: string, anchorPoint?: AnchorPoint, targetPoint?: AnchorPoint }
+
+export type OptionProps = BaseProps & ButtonVariantProps & { label: string };
+export const TEXT_KEYS = ['bold', 'semibold', 'underline', 'italic', 'strike', 'caps', 'nums'] as const;
+export type TextFlags = Flags<typeof TEXT_KEYS>;

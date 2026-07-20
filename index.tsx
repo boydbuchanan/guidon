@@ -1,6 +1,6 @@
 import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
-import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP } from "./types";
-import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, Flags, RailLayoutFlags, StateTypeFlags } from "./types";
+import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, TEXT_KEYS } from "./types";
+import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, Flags, OptionProps, RailLayoutFlags, StateTypeFlags, TextFlags } from "./types";
 import { pluck, split, toClassNames, cx, flagClass } from "./utils";
 
 /**
@@ -95,9 +95,16 @@ export function Button({
  * Should be used with h1-h6, p, or other text elements to ensure semantic HTML.
  * Matches .text css class.
  */
-export function Text({as = "span", className, ...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType }) {
+export function Text({as = "span", className, ...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType } & TextFlags) {
   const Component = (as) as React.ElementType;
-  return <Component className={cx('text', className)} {...props} />
+  const { flags, rest, ...base } = split(props, TEXT_KEYS);
+  const cssClasses = flagClass(flags, TEXT_KEYS);
+  const baseClasses = toClassNames({ flags, rest, ...base });
+
+  return <Component className={cx('text', className, cssClasses, baseClasses)} {...props} />
+}
+export function Span({className, ...props}: React.HTMLAttributes<HTMLElement> & TextFlags) {
+  return <Text as="span" className={cx('text', className)} {...props} />
 }
 
 export function Link({className, ...props}: React.ComponentProps<"a"> ) {
@@ -166,9 +173,41 @@ export function RadioGroup({
   row,
   col,
   ...props
-}: React.ComponentProps<typeof Container>) {
+}: React.ComponentProps<typeof Content>) {
   return (
     <Content className={cx('joined radio', className)} row={col ? false : true} col={col ? true : false} {...props}/>
+  )
+}
+
+export function Tabs({
+  className,
+  items,
+  children,
+  ...props
+}: React.ComponentProps<typeof Container> & { items: (OptionProps & { icon?: React.ReactNode })[] }) {
+
+  return (
+    <RadioState items={items}>
+      <RadioGroup muted gap pad>
+        {items.map(({ icon, ...tab }) => (
+          <StateButton key={tab.id} {...tab}>
+            {icon}
+            {tab.label}
+          </StateButton>
+        ))}
+      </RadioGroup>
+      <Container fit className={cx('tabs', className)} {...props}>
+        {children}
+      </Container>
+    </RadioState>
+  )
+}
+export function TabContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof Content>) {
+  return (
+    <Content {...props}/>
   )
 }
 /**
@@ -184,6 +223,12 @@ export function Container({
   ...props
 }: React.ComponentProps<typeof Content>) {
   return <Content className={cx('container', className)} col={row ? false : true} row={row ? true : false} {...props}/>
+};
+export function Card({
+  className,
+  ...props
+}: React.ComponentProps<typeof Content>) {
+  return <Content className={cx('card', className)} {...props}/>
 };
 export function Grid({
   cols,
@@ -427,6 +472,13 @@ export function CheckIcon({ ...props }: SvgIconProps) {
   return (
     <SvgIcon fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props} >
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+    </SvgIcon>
+  )
+}
+export function ZapIcon({ ...props }: SvgIconProps) {
+  return (
+    <SvgIcon fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props} >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
     </SvgIcon>
   )
 }

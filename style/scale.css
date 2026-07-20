@@ -8,6 +8,8 @@ Fluid Type Variables
   --fluid-max-width: 1240;
 
   --fluid-screen: 100vw;
+  
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 @media screen and (min-width: 1240px) {
@@ -111,11 +113,17 @@ small {
 .underline { text-decoration: underline; }
 .italic { font-style: italic; }
 .strike { text-decoration: line-through; }
+.caps { text-transform: uppercase; letter-spacing: 0.08em; }
+.nums { font-variant-numeric: tabular-nums; }
 
 button {
   padding: var(--space-2xs) var(--space-xs);
 }
 
+code {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+}
 .gap { gap: var(--space-3xs); }
 .gap-1 { gap: var(--space-2xs); }
 .gap-2 { gap: var(--space-xs); }

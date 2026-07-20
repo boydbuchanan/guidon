@@ -149,6 +149,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2xs);
   cursor: pointer;
   transition: all 0.2s;
   border: none;
@@ -376,8 +377,10 @@ main {
 .content[data-state='closed'] { animation: collapse-height var(--transition-speed) ease-in-out forwards; opacity: 0; }
 .content[data-state='open'] { animation: expand-height var(--transition-speed) ease-in-out forwards; opacity: 1; }
 
-/* Tab slider — animation in from left, transition out to right */
-.tabs {
+/* Tab slider — animation in from left, transition out to right.
+   Doubled selectors outrank the later .col/.row/.container display:flex rules,
+   otherwise the grid-area stacking below never applies. */
+.tabs, .tabs.col, .tabs.row {
   display: grid;
   overflow: hidden;
   width: 100%;
@@ -450,13 +453,11 @@ main {
 .card {
   gap: var(--space-xs);
   border-radius: var(--radius);
-  padding: var(--space-s);
   border: 1px solid var(--border);
   align-items: center;
 }
 
 .container {
-  padding: var(--container-padding);
   overflow-y: auto;
 }
 .fit { width: fit-content; height: fit-content;}

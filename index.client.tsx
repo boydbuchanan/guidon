@@ -2,7 +2,7 @@
 import React from "react";
 import { Button, SquareCheckIcon, SquareIcon } from ".";
 
-import { pluck } from "./utils";
+import { cx, pluck, scrollToTarget } from "./utils";
 import { createPortal } from "react-dom";
 import { useLocalIdState } from "./state.client";
 import { useKeyPress, usePortal } from "./hooks";
@@ -60,6 +60,49 @@ export function StateButton({
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * Anchor link that sets a state id and
+ * scrolls the target element into view, offsetting for the a header's
+ * real height. Falls back to a plain in-page jump when
+ * the target can't be found, and to native anchor behavior for modified
+ * clicks (ctrl/cmd/middle-click — open in a new tab as usual).
+ */
+export function GoToButton({
+  stateId,
+  offset = 12,
+  href,
+  onClick,
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"a"> & { stateId?: string; offset?: number }) {
+  const { setValue } = useLocalIdState();
+
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    const isPlainClick = event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+
+    if (isPlainClick) {
+      if (stateId) setValue(stateId, true);
+
+      const targetId = href?.startsWith('#') ? href.slice(1) : undefined;
+      const target = targetId ? document.getElementById(targetId) : null;
+      if (target) {
+        event.preventDefault();
+        scrollToTarget(target, offset);
+        history.pushState(null, '', href!);
+      }
+    }
+
+    onClick?.(event);
+  };
+
+  return (
+    <a href={href} className={cx('text link', className)} onClick={handleClick} {...props}>
+      {children}
+    </a>
   );
 }
 

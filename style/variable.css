@@ -64,7 +64,7 @@
   --secondary-ghost: color-mix(in oklch, var(--secondary), transparent 85%);
 
   --muted: oklch(from var(--muted-hex) l c h);
-  --muted-foreground: oklch(from var(--muted-hex) 0.4 c h);
+  --muted-foreground: oklch(from var(--muted-foreground-hex) l c h);
   --muted-dark: oklch(from var(--muted-hex) 0.8 c h);
 
   --accent: var(--accent-hex);
@@ -74,7 +74,7 @@
   --accent-ghost: color-mix(in oklch, var(--accent), transparent 80%);
 
   --destructive: oklch(from var(--destructive-hex) l c h);
-  --destructive-foreground: oklch(from var(--destructive-hex) 0.15 c h);
+  --destructive-foreground: oklch(from var(--destructive-foreground-hex) l c h);
   --destructive-light: oklch(from var(--destructive-hex) 0.6 c h);
   --destructive-dark:  oklch(from var(--destructive-hex) 0.3 c h);
   --destructive-ghost: color-mix(in oklch, var(--destructive), transparent 80%);
@@ -96,7 +96,7 @@
 
   --card: oklch(from var(--card-hex) l c h);
   --card-border: oklch(from var(--card-hex) 0.8 c h);
-  --card-foreground: oklch(from var(--card-hex) 0.2 c h);
+  --card-foreground: oklch(from var(--card-foreground-hex) l c h);
 
   --menu: oklch(from var(--menu-hex) l c h);
   --menu-foreground: oklch(from var(--menu-foreground-hex) l c h);
