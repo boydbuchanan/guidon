@@ -14,19 +14,32 @@
   --header-padding: var(--space-2xs) var(--space-m);
   --panel-width: 18rem;  
   --panel-padding: var(--space-2xs) var(--space-m);
-  --sheet-width: 32rem;  
+  --sheet-width: 32rem;
   --container-padding: var(--space-2xs) var(--space-m);
 
-  /* Z Index Reference */
+  /* MAIN AREA — the viewport minus any docked rails.
+     Rail widths are hoisted to :root (see :root:has() below) so elements
+     portaled to <body> (sheets, modals) can still size against the main area. */
+  --rail-left-width: 0rem;
+  --rail-right-width: 0rem;
+  --main-bottom: 0rem;
+  --main-left: var(--rail-left-width);
+  --main-right: var(--rail-right-width);
+  --main-width: calc(100vw - var(--main-left) - var(--main-right));
+  --main-center: calc(var(--main-left) + var(--main-width) / 2);
+
+  /* Z Index Layers (bottom → top): content, header, menu, rail panels, sheets, modals.
+     0–15 are element-level (within a layer); 20+ are layout layers. */
   --z-bg: 0;
   --z-inactive: 5;
   --z-default: 10;
   --z-priority: 12;
   --z-focus: 15;
-  --z-menu: 20;
-  --z-header: 30;
-  --z-rail: 35;
-  --z-modal: 40;
+  --z-header: 20;
+  --z-menu: 30;
+  --z-rail: 40;
+  --z-sheet: 50;
+  --z-modal: 60;
 
   /* SHADOWS (Using OKLCH for softer shadows) */
   --shadow-color: oklch(0% 0 0 / 0.08);
@@ -55,13 +68,15 @@ a {
   text-decoration: none;
 }
 
+/* Sits at the sheet layer: below its own panel (DOM order breaks the tie for
+   sheets; modals are a full layer above) but over rails, menus, and content. */
 .backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.2);
   backdrop-filter: blur(4px);
   transition: opacity 0.3s ease;
-  z-index: var(--z-modal);
+  z-index: var(--z-sheet);
 }
 
 .spinner {
@@ -93,6 +108,24 @@ a {
   from { transform: translateX(0); opacity: 1; }
   to   { transform: translateX(100%);     opacity: 0; }
 }
+@keyframes slide-in-top {
+  from { transform: translateY(-100%) translateX(-50%); opacity: 0; }
+  to   { transform: translateY(0) translateX(-50%);     opacity: 1; }
+}
+
+@keyframes slide-out-top {
+  from { transform: translateY(0) translateX(-50%); opacity: 1; }
+  to   { transform: translateY(-100%) translateX(-50%);     opacity: 0; }
+}
+@keyframes slide-in-bottom {
+  from { transform: translateY(100%) translateX(-50%); opacity: 0; }
+  to   { transform: translateY(0) translateX(-50%);     opacity: 1; }
+}
+
+@keyframes slide-out-bottom {
+  from { transform: translateY(0) translateX(-50%); opacity: 1; }
+  to   { transform: translateY(100%) translateX(-50%);     opacity: 0; }
+}
 @keyframes collapse-height {
   from { height: fit-content;}
   to   { height: 0; }
@@ -116,6 +149,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2xs);
   cursor: pointer;
   transition: all 0.2s;
   border: none;
@@ -210,14 +244,31 @@ header.sticky {
 .rail-left .rail.panel, .rail-right .rail.panel {
   width: var(--panel-width);
 }
-.rail-left main, .rail-left .panel[data-side="left"] {
-  margin-left: var(--rail-width);
+/* A docked rail reserves space by publishing its width to :root, so even
+   fixed/portaled elements outside the rail wrapper can respect it. */
+:root:has(.rail-left)  { --rail-left-width: var(--rail-width); }
+:root:has(.rail-right) { --rail-right-width: var(--rail-width); }
+
+main {
+  margin-left: var(--main-left);
+  margin-right: var(--main-right);
+  margin-bottom: var(--main-bottom);
 }
-.rail-right main, .rail-right .panel[data-side="right"] {
-  margin-right: var(--rail-width);
+.rail-left .panel[data-side="left"] {
+  margin-left: var(--main-left);
+}
+.rail-right .panel[data-side="right"] {
+  margin-right: var(--main-right);
 }
 
 @media (max-width: 48rem) and (orientation: portrait) {
+  /* Rails dock to the bottom edge: the main area spans the full width and
+     is inset from the bottom instead. */
+  :root, :root:has(.rail-left), :root:has(.rail-right) {
+    --rail-left-width: 0rem;
+    --rail-right-width: 0rem;
+    --main-bottom: var(--bottom-rail-height);
+  }
   nav.rail .buttons {
     flex-direction: row;
     width: 100%;
@@ -246,12 +297,6 @@ header.sticky {
   }
   :is(.rail-left .panel[data-side="left"],.rail-right .panel[data-side="right"]) {
     bottom: var(--bottom-rail-height);
-    height: 100vh - var(--bottom-rail-height);
-  }  
-  :is(.rail-left main, .rail-left .panel[data-side="left"], .rail-right main, .rail-right .panel[data-side="right"]) {
-    margin-left: unset;
-    margin-right: unset;
-    margin-bottom: var(--bottom-rail-height)
   }
   .rail .logo {
     left: var(--space-2xs);
@@ -280,12 +325,26 @@ header.sticky {
   box-sizing: border-box;
 }
 
+/* Sheets overlay the main area only — positioned and sized by the --main-*
+   vars, so they respect docked rails even though they portal to <body>. */
 .panel.sheet {
-  /* min-width: var(--sheet-width); */
   position: fixed;
-  width: 100vw;
-  bottom: 0;
-  z-index: var(--z-modal);
+  z-index: var(--z-sheet);
+}
+.panel.sheet[data-side="top"],
+.panel.sheet[data-side="bottom"] {
+  width: var(--main-width);
+  /* keyframes apply translateX(-50%), centering the sheet over the main area */
+  left: var(--main-center);
+}
+.panel.sheet[data-side="bottom"] {
+  bottom: var(--main-bottom);
+}
+.panel.sheet[data-side="left"],
+.panel.sheet[data-side="right"] {
+  width: var(--sheet-width);
+  max-width: min(80vw, var(--main-width));
+  bottom: var(--main-bottom);
 }
 
 .panel[data-side="left"] {
@@ -315,12 +374,13 @@ header.sticky {
   transition: opacity var(--transition-speed) ease;
 }
 .content[data-state='false'] { display: none; }
-.collapse { transition: height var(--transition-speed) ease-in-out, opacity var(--transition-speed); }
-.collapse[data-state='closed'] { animation: collapse-height var(--transition-speed) ease-in-out forwards; opacity: 0; }
-.collapse[data-state='open'] { animation: expand-height var(--transition-speed) ease-in-out forwards; opacity: 1; }
+.content[data-state='closed'] { animation: collapse-height var(--transition-speed) ease-in-out forwards; opacity: 0; }
+.content[data-state='open'] { animation: expand-height var(--transition-speed) ease-in-out forwards; opacity: 1; }
 
-/* Tab slider — animation in from left, transition out to right */
-.tabs {
+/* Tab slider — animation in from left, transition out to right.
+   Doubled selectors outrank the later .col/.row/.container display:flex rules,
+   otherwise the grid-area stacking below never applies. */
+.tabs, .tabs.col, .tabs.row {
   display: grid;
   overflow: hidden;
   width: 100%;
@@ -351,11 +411,11 @@ header.sticky {
 .open-rotate {transition: transform var(--transition-speed) ease;}
 [data-state='open'] .open-rotate {transform: rotate(180deg);}
 
-.rail[data-side="left"][data-state='in'] { animation: slide-in-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
-.rail[data-side="left"][data-state='out'] { animation: slide-out-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; opacity: 0; pointer-events: none; }
+[data-side="left"][data-state='in'] { animation: slide-in-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+[data-side="left"][data-state='out'] { animation: slide-out-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; opacity: 0; pointer-events: none; }
 
-.rail[data-side="right"][data-state='in'] { animation: slide-in-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
-.rail[data-side="right"][data-state='out'] { animation: slide-out-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; opacity: 0; pointer-events: none; }
+[data-side="right"][data-state='in'] { animation: slide-in-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+[data-side="right"][data-state='out'] { animation: slide-out-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; opacity: 0; pointer-events: none; }
 
 .panel[data-side="center"]{
   top: 50%;
@@ -370,38 +430,34 @@ header.sticky {
   left: 50%;
   height: fit-content;
   max-height: 70vh;
-  transform: translateX(-50%);
   border-top-left-radius: var(--panel-radius);
   border-top-right-radius: var(--panel-radius);
   border: var(--border-style);
 }
-[data-side="bottom"][data-state='in'] { opacity: 1; }
-[data-side="bottom"][data-state='out'] { transform: translateY(200%) translateX(-50%); opacity: 0; pointer-events: none; }
+[data-side="bottom"][data-state='in'] { opacity: 1; animation: slide-in-bottom var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+[data-side="bottom"][data-state='out'] { opacity: 0; pointer-events: none; animation: slide-out-bottom var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
 .panel[data-side="top"] {
   flex-direction: column-reverse;
   top: 0;
   left: 50%;
   height: fit-content;
   max-height: 70vh;
-  transform: translateX(-50%);
   border-bottom-left-radius: var(--panel-radius);
   border-bottom-right-radius: var(--panel-radius);
   border-bottom: var(--border-style);
 }
-[data-side="top"][data-state='in'] { opacity: 1; }
-[data-side="top"][data-state='out'] { transform: translateY(-200%) translateX(-50%); opacity: 0; pointer-events: none; }
+[data-side="top"][data-state='in'] { opacity: 1; animation: slide-in-top var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+[data-side="top"][data-state='out'] {opacity: 0; pointer-events: none; animation: slide-out-top var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
 
 /* Element Styling: Flex, Card, Group */
 .card {
   gap: var(--space-xs);
   border-radius: var(--radius);
-  padding: var(--space-s);
   border: 1px solid var(--border);
   align-items: center;
 }
 
 .container {
-  padding: var(--container-padding);
   overflow-y: auto;
 }
 .fit { width: fit-content; height: fit-content;}

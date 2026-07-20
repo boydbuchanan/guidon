@@ -22,6 +22,9 @@ a:hover { color: var(--primary-dark); }
   background: var(--menu);
   color: var(--menu-foreground);
 }
+header.menu {
+  border-bottom: 1px solid var(--border);
+}
 .card {
   background: var(--card);
   color: var(--card-foreground);
@@ -115,6 +118,10 @@ header {
   border-bottom: 1px solid var(--border);
 }
 
+code {
+  background: var(--muted);
+}
+
 /* ==========================================
    BUTTON BASE & MODES
    ========================================== */
@@ -152,8 +159,8 @@ button.background {
 .outline       { border: var(--border-style); border-color: var(--item-border); background: transparent; color: var(--item-color); }
 .outline:hover { background: var(--item-ghost); }
 
-.hoverline       { border-color: transparent; border: var(--border-style); background: color-mix(in oklch, var(--item-color), transparent 95%); color: var(--item-dark); }
-.hoverline:hover { border-color: var(--item-color); color: var(--item-dark); }
+.hoverline       { border-color: transparent; border: var(--border-style); background: color-mix(in oklch, var(--item-color), transparent 95%); color: var(--item-color); }
+.hoverline:hover { border-color: var(--item-color); color: var(--item-color); }
 
 /* Button data-state */
 button[data-state='inactive']:hover { background: var(--muted); color: var(--primary-light); }
