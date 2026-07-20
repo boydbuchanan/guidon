@@ -19,7 +19,7 @@ export type Alignment = {
   spacing?: Spacing;
 }
 
-export const FLEX_KEYS = ['mode', 'side', 'vertical', 'spacing', 'wrap', 'reverse', 'baseline', 'gap', 'pad'] as const;
+export const FLEX_KEYS = ['mode', 'side', 'vertical', 'spacing', 'wrap', 'reverse', 'baseline', 'gap', 'pad', 'basis', 'width'] as const;
 export type FlexProps = {
   mode?: FlexMode;
   horizontal?: Horizontal;
@@ -57,7 +57,7 @@ export const STATE_MAP: Arrays<typeof STATE_KEYS> = {
 };
 
 export const CONTENT_KEYS = [
-  'row', 'col', 'grid',
+  'row', 'col',
   'fit', 'border', 'borderchild',
   'left', 'right', 'center', // horizontal
   'top', 'middle', 'bottom',  // vertical
@@ -71,6 +71,10 @@ export type ButtonVariantProps = Flags<typeof BUTTON_VARIANT_KEYS> & StyleProps
 
 export const RAIL_LAYOUT_KEYS = ['left', 'right'] as const;
 export type RailLayoutFlags = Flags<typeof RAIL_LAYOUT_KEYS>;
+
+export const PANEL_KEYS = ['left', 'right', 'top', 'bottom', 'center'] as const;
+export type PanelFlags = Flags<typeof PANEL_KEYS>;
+export type PanelProps = PanelFlags & BaseProps;
 
 export type AnchorPoint =
   | 'top-left'    | 'top-right'    | 'top-center'    | 'top'

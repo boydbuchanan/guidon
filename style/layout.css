@@ -108,23 +108,21 @@ a {
   from { transform: translateX(0); opacity: 1; }
   to   { transform: translateX(100%);     opacity: 0; }
 }
-@keyframes slide-in-top {
-  from { transform: translateY(-100%) translateX(-50%); opacity: 0; }
-  to   { transform: translateY(0) translateX(-50%);     opacity: 1; }
-}
-
-@keyframes slide-out-top {
-  from { transform: translateY(0) translateX(-50%); opacity: 1; }
-  to   { transform: translateY(-100%) translateX(-50%);     opacity: 0; }
-}
 @keyframes slide-in-bottom {
   from { transform: translateY(100%) translateX(-50%); opacity: 0; }
-  to   { transform: translateY(0) translateX(-50%);     opacity: 1; }
+  to   { transform: translateY(0)     translateX(-50%); opacity: 1; }
 }
-
 @keyframes slide-out-bottom {
-  from { transform: translateY(0) translateX(-50%); opacity: 1; }
-  to   { transform: translateY(100%) translateX(-50%);     opacity: 0; }
+  from { transform: translateY(0)     translateX(-50%); opacity: 1; }
+  to   { transform: translateY(100%)  translateX(-50%); opacity: 0; }
+}
+@keyframes slide-in-top {
+  from { transform: translateY(-100%) translateX(-50%); opacity: 0; }
+  to   { transform: translateY(0)      translateX(-50%); opacity: 1; }
+}
+@keyframes slide-out-top {
+  from { transform: translateY(0)      translateX(-50%); opacity: 1; }
+  to   { transform: translateY(-100%)  translateX(-50%); opacity: 0; }
 }
 @keyframes collapse-height {
   from { height: fit-content;}
@@ -166,6 +164,10 @@ input {
 input:focus {
   outline: none;
   z-index: var(--z-focus);
+}
+
+code {
+  border-radius: var(--radius);
 }
 
 /* Layout Styles: Header, Panels (Sheet, Modal), Rails */
@@ -414,8 +416,21 @@ main {
 [data-side="left"][data-state='in'] { animation: slide-in-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
 [data-side="left"][data-state='out'] { animation: slide-out-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; opacity: 0; pointer-events: none; }
 
-[data-side="right"][data-state='in'] { animation: slide-in-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
-[data-side="right"][data-state='out'] { animation: slide-out-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; opacity: 0; pointer-events: none; }
+.rail[data-side="right"][data-state='in'] { animation: slide-in-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+.rail[data-side="right"][data-state='out'] { animation: slide-out-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; opacity: 0; pointer-events: none; }
+
+/* Panel/Sheet slide direction — overrides the generic .slide (tab-carousel) motion per edge,
+   since a panel should enter/exit from its own docked side, not always left-in/right-out. */
+.panel.slide[data-side="left"][data-state='in']    { animation: slide-in-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+.panel.slide[data-side="left"][data-state='out']   { animation: slide-out-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+.panel.slide[data-side="right"][data-state='in']   { animation: slide-in-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+.panel.slide[data-side="right"][data-state='out']  { animation: slide-out-right var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+.panel.slide[data-side="top"][data-state='in']     { animation: slide-in-top var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+.panel.slide[data-side="top"][data-state='out']    { animation: slide-out-top var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+.panel.slide[data-side="bottom"][data-state='in'],
+.panel.slide.sheet:not([data-side])[data-state='in']   { animation: slide-in-bottom var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
+.panel.slide[data-side="bottom"][data-state='out'],
+.panel.slide.sheet:not([data-side])[data-state='out']  { animation: slide-out-bottom var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
 
 .panel[data-side="center"]{
   top: 50%;
@@ -470,6 +485,7 @@ main {
 .grid {display: grid;}
 .grid.square > * {aspect-ratio: 1 / 1;}
 
+.flex {display: flex; flex-direction: row;}
 .row {display: flex; flex-direction: row; flex-wrap: nowrap}
 .col {display: flex; flex-direction: column; flex-wrap: nowrap}
 
@@ -505,14 +521,15 @@ main {
 .col.wrap.push, .row.wrap.push { align-content: space-between; }
 .col.wrap.expand, .row.wrap.expand { align-content: stretch; }
 
-.row .basis-1, .col .basis-1 { flex-basis: 100%; }
+.row .basis, .row .basis-1, .col .basis, .col .basis-1 { flex-basis: 100%; }
 .row .basis-2, .col .basis-2 { flex-basis: 50%; }
 .row .basis-3, .col .basis-3 { flex-basis: 33.333%; }
 .row .basis-4, .col .basis-4 { flex-basis: 25%; }
 
-.row .width-75, .col .width-75 { width: 75%; }
-.row .width-67, .col .width-67 { width: 66.666%; }
-.row .width-50, .col .width-50 { width: 50%; }
+.full-width, .width-1, .width-100 { width: 100%; max-width: max-content; }
+.width-75, .width-75 { width: 75%; }
+.width-67, .width-67 { width: 66.666%; }
+.half-width, .width-50 { width: 50%; }
 
 
 .joined {

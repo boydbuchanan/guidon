@@ -1,7 +1,8 @@
 import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
-import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, TEXT_KEYS } from "./types";
-import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, Flags, OptionProps, RailLayoutFlags, StateTypeFlags, TextFlags } from "./types";
-import { pluck, split, toClassNames, cx, flagClass } from "./utils";
+import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, PANEL_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, TEXT_KEYS } from "./types";
+import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, OptionProps, PanelProps, RailLayoutFlags, StateTypeFlags, TextFlags } from "./types";
+import { pluck, split, toClassNames, cx, flagClass, getAnchorStyle } from "./utils";
+import { LocalProvider, RadioProvider, SelectionProvider, ToggleProvider, type MinMax } from "./state.client";
 
 /**
  * Container component for layout.
@@ -42,7 +43,7 @@ export function Content({
 
   if(props.id){
     
-    var stateType = STATE_KEYS.find(type => props[type] === true);
+    const stateType = STATE_KEYS.find(type => props[type] === true);
     const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
 
     return <StateContent trueState={on} falseState={off} className={cx(baseClasses, stateType, className)} style={styleProps} {...rest}  />
@@ -79,7 +80,7 @@ export function Button({
   }
 
   if(props.id){
-    var stateType = STATE_KEYS.find(type => props[type] === true);
+    const stateType = STATE_KEYS.find(type => props[type] === true);
     const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
     return <StateButton trueState={on} falseState={off} className={cx(buttonVariant, baseClasses, stateType, className)} style={styleProps} {...rest}/>
   }
@@ -239,7 +240,7 @@ export function Grid({
     ...(cols && { gridTemplateColumns: `repeat(${cols}, 1fr)`, gridAutoRows: '1fr' }),
     ...style,
   };
-  return <Content {...props} grid row={false} col={false} style={gridStyle} />
+  return <Content {...props} row={false} col={false} style={gridStyle} className="grid" />
 };
 /**
  * Default Content component for layout. Renders a flex container with column layout.
@@ -247,7 +248,7 @@ export function Grid({
  */
 export function Col({
   ...props
-}: React.ComponentProps<typeof Container>) {
+}: React.ComponentProps<typeof Content>) {
   return <Content {...props} col row={false}/>
 }
 /**
@@ -256,13 +257,9 @@ export function Col({
  */
 export function Row({
   ...props
-}: React.ComponentProps<typeof Container>) {
+}: React.ComponentProps<typeof Content>) {
   return <Content {...props} row col={false}/>
 };
-export const PANEL_KEYS = ['left', 'right', 'top', 'bottom', 'center'] as const;
-export type PanelFlags = Flags<typeof PANEL_KEYS>;
-export type PanelProps = PanelFlags & BaseProps;
-
 /**
  * Panel is a component for content that is anchored to a position on screen.
  */
@@ -273,7 +270,7 @@ export function Panel({
   ...props
 }: PanelProps & React.ComponentProps<typeof Container>) {
   const [flags, rest] = pluck(props, PANEL_KEYS);
-  var side = PANEL_KEYS.find(type => flags[type] === true);
+  const side = PANEL_KEYS.find(type => flags[type] === true);
   
   return (
     <Content 
@@ -347,7 +344,7 @@ export function RailButton({...props}: React.ComponentProps<typeof StateButton>)
 
 export function RailLayoutWrapper({ id = 'rail-root', className, children, left, right, ...props }: { children: React.ReactNode } & React.ComponentProps<"div"> & RailLayoutFlags & BaseProps) {
   
-  var layoutClass = `${left ? 'rail-left' : ''} ${right ? 'rail-right' : ''}`;
+  const layoutClass = `${left ? 'rail-left' : ''} ${right ? 'rail-right' : ''}`;
 
   return (
     <div id={'rail-root'} className={cx(layoutClass, className)} {...props}>
@@ -497,8 +494,6 @@ export function SquareCheckIcon({ ...props }: SvgIconProps) {
     </SvgIcon>
   )
 }
-import { LocalProvider, RadioProvider, SelectionProvider, ToggleProvider, type MinMax } from "./state.client";
-import { getAnchorStyle } from "./dev";
 
 export function LocalState({
   items,
