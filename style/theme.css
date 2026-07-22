@@ -164,9 +164,16 @@ button.background {
 
 /* Button data-state */
 button[data-state='inactive']:hover { background: var(--muted); color: var(--primary-light); }
-button[data-state='active']         { background: var(--primary); color: white; }
+button[data-state='active']         { background: var(--item-color); }
 button[data-state='false'] { background: transparent; color: var(--item-dark); }
-button[data-state='true']  { background: var(--item-color); color: var(--item-fg); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+/* Active segment = the light surface raised on the group's (muted/grey) track —
+   "white on grey" — not a solid item-colour fill. This is the TAB look. */
+button.tab[data-state='true']  { background: var(--item-fg); color: var(--item-color); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+/* A bordered toggle (outline) keeps its border in every state and FILLS with
+   the item colour when active — the button-GROUP look, distinct from a tab.
+   The fill follows the theme flag (primary/accent/…), so it stays switchable. */
+.outline[data-state='true'] { background: var(--item-color); color: var(--item-fg); border-color: var(--item-color); }
 
 
 ::-webkit-scrollbar {

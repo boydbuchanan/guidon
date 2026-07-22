@@ -1,6 +1,6 @@
 import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
-import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, PANEL_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, TEXT_KEYS } from "./types";
-import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, OptionProps, PanelProps, RailLayoutFlags, StateTypeFlags, TextFlags } from "./types";
+import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, INPUT_KEYS, PANEL_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, TEXT_KEYS } from "./types";
+import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, InputFlags, OptionProps, PanelProps, RailLayoutFlags, StateTypeFlags, TextFlags, ThemeFlags } from "./types";
 import { pluck, split, toClassNames, cx, flagClass, getAnchorStyle } from "./utils";
 import { LocalProvider, RadioProvider, SelectionProvider, ToggleProvider, type MinMax } from "./state.client";
 
@@ -20,13 +20,16 @@ export function Content({
   style,
   ...props
 }: React.ComponentProps<typeof StateContent> & ContentProps & AnchorProps) {
-  const [, base] = pluck(props, STATE_KEYS);
-  const { flags, rest, flex, theme } = split(base, CONTENT_KEYS);
+  // The state flag names the on/off pair; strip it before the split so it can't
+  // reach the DOM as an unknown attribute (Button does the same).
+  const stateType = STATE_KEYS.find(type => props[type] === true);
+  const [, stateless] = pluck(props, STATE_KEYS);
+  const { flags, rest, flex, base, theme } = split(stateless, CONTENT_KEYS);
   if(props.debug)
     console.log("Content props: ", { flags, flex, theme });
 
   // Flags and Flex will generate duplicate properties but CX will deduplicate
-  const baseClasses = toClassNames({ flags, rest, flex, theme });
+  const baseClasses = toClassNames({ flags, rest, flex, base, theme });
   if(props.debug)
     console.log("Base Classes: ", baseClasses);
   
@@ -42,8 +45,6 @@ export function Content({
   }
 
   if(props.id){
-    
-    const stateType = STATE_KEYS.find(type => props[type] === true);
     const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
 
     return <StateContent trueState={on} falseState={off} className={cx(baseClasses, stateType, className)} style={styleProps} {...rest}  />
@@ -63,9 +64,14 @@ export function Button({
   style,
   ...props
 }: React.ComponentProps<typeof StateButton> & StateTypeFlags & ButtonVariantProps & { anchorId?: string }) {
+  // The state flag names the on/off pair; strip it before the split so it can't
+  // reach the DOM as an unknown attribute (Content does the same).
+  const stateType = STATE_KEYS.find(type => props[type] === true);
+  const [, stateless] = pluck(props, STATE_KEYS);
+
   // Split out button-specific keys + base framework keys
-  const { flags, rest, ...base } = split(props, BUTTON_VARIANT_KEYS);
-  
+  const { flags, rest, ...base } = split(stateless, BUTTON_VARIANT_KEYS);
+
   // 'extra' contains ghost, outline, etc.
   const buttonVariant = flagClass(flags, BUTTON_VARIANT_KEYS);
   
@@ -80,7 +86,6 @@ export function Button({
   }
 
   if(props.id){
-    const stateType = STATE_KEYS.find(type => props[type] === true);
     const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
     return <StateButton trueState={on} falseState={off} className={cx(buttonVariant, baseClasses, stateType, className)} style={styleProps} {...rest}/>
   }
@@ -90,13 +95,26 @@ export function Button({
   );
 }
 
+export function Input({
+  type = 'text',
+  className,
+  style,
+  ...props
+}: React.ComponentProps<'input'> & InputFlags) {
+  const { flags, rest, ...base } = split(props, INPUT_KEYS);
+  const cssClasses = flagClass(flags, INPUT_KEYS);
+  const baseClasses = toClassNames({ flags, rest, ...base });
+
+  return <input className={cx('input', className, cssClasses, baseClasses)} style={style} {...props} />
+}
+
 
 /**
  * Text component for typography. Renders a span by default, but can render any component specified by the 'as' prop.
  * Should be used with h1-h6, p, or other text elements to ensure semantic HTML.
  * Matches .text css class.
  */
-export function Text({as = "span", className, ...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType } & TextFlags) {
+export function Text({as = "span", className, ...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType } & TextFlags & ThemeFlags) {
   const Component = (as) as React.ElementType;
   const { flags, rest, ...base } = split(props, TEXT_KEYS);
   const cssClasses = flagClass(flags, TEXT_KEYS);
@@ -181,34 +199,51 @@ export function RadioGroup({
 }
 
 export function Tabs({
-  className,
   items,
   children,
   ...props
-}: React.ComponentProps<typeof Container> & { items: (OptionProps & { icon?: React.ReactNode })[] }) {
+}: React.ComponentProps<typeof RadioGroup> & { items: (OptionProps & { icon?: React.ReactNode })[] }) {
 
   return (
-    <RadioState items={items}>
-      <RadioGroup muted gap pad>
-        {items.map(({ icon, ...tab }) => (
-          <StateButton key={tab.id} {...tab}>
-            {icon}
-            {tab.label}
-          </StateButton>
-        ))}
-      </RadioGroup>
-      <Container fit className={cx('tabs', className)} {...props}>
-        {children}
-      </Container>
-    </RadioState>
+    <Content className={'tabs'}>
+      <RadioState items={items}>
+        <RadioGroup {...props} >
+          {items.map(({ icon, ...tab }) => (
+            <TabButton key={tab.id || crypto.randomUUID()} {...tab}>
+              {icon}
+              {tab.label}
+            </TabButton>
+          ))}
+        </RadioGroup>
+        <Container className="tab">
+          {children}
+        </Container>
+      </RadioState>
+    </Content>
   )
 }
+/**
+ * Creates a 'button.tab' element for use within a Tabs component.
+ */
+export function TabButton({className, children, ...props}: React.ComponentProps<typeof Button> & BaseProps) {
+  return (
+    <Button className={cx('tab', className)} {...props}>
+      {children}
+    </Button>
+  );
+}
+/**
+ * Creates a '.content.tab' element for use within a Tabs component.
+ * Hugs by default — the pane sizes the tab stack, and the surface around it
+ * (sheet body, page) owns the scrolling. Pass `scroll` only when the pane is
+ * itself inside a bound and should keep its own scrollbar.
+ */
 export function TabContent({
   className,
   ...props
 }: React.ComponentProps<typeof Content>) {
   return (
-    <Content {...props}/>
+    <Content className={cx('tab content', className)} {...props}/>
   )
 }
 /**
@@ -282,6 +317,24 @@ export function Panel({
       >
       {children}
     </Content>
+  );
+};
+/**
+ * A sheet and the control that opens it, as one unit.
+ */
+export function SheetItem({children, className, ...props}: React.ComponentProps<typeof Panel> & ButtonVariantProps & BaseProps) {
+  
+  const { rest, } = split(props, BUTTON_VARIANT_KEYS);
+  const [buttonProps, ] = pluck(props, [...BUTTON_VARIANT_KEYS, ...BASE_KEYS]);
+
+  return (
+    <Sheet>
+      <SheetButton outline {...buttonProps}>{buttonProps.label}</SheetButton>
+      <SheetPanel {...props}>
+        <SheetHeader {...rest}/>
+        {children}
+      </SheetPanel>
+    </Sheet>
   );
 };
 /**
@@ -415,16 +468,13 @@ export function CloseHeader({
   const [base, rest] = pluck(props, BASE_KEYS);
   return (
     <header {...rest}>
-      <Text as='h6' className={`semibold`}>{children}</Text>
-      <CloseButton ghost  {...base} />
+      <Text as='h6' className={`semibold`}>{children || base.label}</Text>
+      <CloseButton ghost {...base} />
     </header>
   );
 };
 
-export function CloseButton({
-  children,
-  ...props
-}: React.ComponentProps<typeof Button> & BaseProps) {
+export function CloseButton({children, ...props}: React.ComponentProps<typeof Button> & BaseProps) {
   return (
     <Button {...props}>
       {children || (

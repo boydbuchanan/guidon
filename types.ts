@@ -41,8 +41,8 @@ export type ThemeFlags = Flags<typeof THEME_KEYS>;
 
 export type StyleProps = ThemeFlags & FlexProps;
 
-export const BASE_KEYS = ['id', 'initial', 'trueState', 'falseState', 'debug'] as const;
-export type BaseProps = { id?: string, initial?: boolean, trueState?: string, falseState?: string, debug?: boolean };
+export const BASE_KEYS = ['id', 'label', 'initial', 'trueState', 'falseState', 'debug'] as const;
+export type BaseProps = { id?: string, label?: string, initial?: boolean, trueState?: string, falseState?: string, debug?: boolean };
 
 export const STATE_KEYS = ['show', 'activate', 'collapse', 'slide', 'bool'] as const;
 export type StateTypeFlags = Flags<typeof STATE_KEYS>;
@@ -59,6 +59,9 @@ export const STATE_MAP: Arrays<typeof STATE_KEYS> = {
 export const CONTENT_KEYS = [
   'row', 'col',
   'fit', 'border', 'borderchild',
+  // Sizing intents — see "Sizing intents" in style/layout.css.
+  // hug is the default; 'screen' is a bound, 'fill'/'scroll' the chain below it.
+  'screen', 'fill', 'scroll', 'scrollx', 'scrolly',
   'left', 'right', 'center', // horizontal
   'top', 'middle', 'bottom',  // vertical
   'start', 'origin', 'end', // wrap alignment
@@ -66,7 +69,7 @@ export const CONTENT_KEYS = [
   'even', 'between', 'around'] as const;
 export type ContentProps = StateTypeFlags & StyleProps & Flags<typeof CONTENT_KEYS>;
 
-export const BUTTON_VARIANT_KEYS = ['hoverline', 'ghost', 'outline'] as const;
+export const BUTTON_VARIANT_KEYS = ['filled', 'hoverline', 'ghost', 'outline'] as const;
 export type ButtonVariantProps = Flags<typeof BUTTON_VARIANT_KEYS> & StyleProps
 
 export const RAIL_LAYOUT_KEYS = ['left', 'right'] as const;
@@ -87,3 +90,5 @@ export type AnchorProps = { anchorId?: string, anchorTo?: string, anchorPoint?: 
 export type OptionProps = BaseProps & ButtonVariantProps & { label: string };
 export const TEXT_KEYS = ['bold', 'semibold', 'underline', 'italic', 'strike', 'caps', 'nums'] as const;
 export type TextFlags = Flags<typeof TEXT_KEYS>;
+export const INPUT_KEYS = ['sunken'] as const;
+export type InputFlags = Flags<typeof INPUT_KEYS>;

@@ -13,6 +13,7 @@ const defaultState: IdState = {
 
 export type IdActions = {
   setValue: (id: string, value: boolean) => void;
+  onChange: (id: string, callback: (value: boolean) => void) => () => void;
 };
 export type StateProviderProps = { 
   children: React.ReactNode, 
@@ -25,16 +26,19 @@ const StateContext = createContext<IdState | null>(null);
 const ActionContext = createContext<IdActions | null>(null);
 
 export type UpdateStrategy = (prev: IsTrueMap, id: string, value?: boolean) => IsTrueMap;
+
 export function useRootIdState() {
   const state = useStore(idStore);
   return {
     isTrue: state.isTrue,
     setValue: useCallback((id: string, value?: boolean) => {
-      idStore.setState(prev => ({ 
-        ...prev, 
-        isTrue: defaultStrategy(prev.isTrue, id, value) 
+      idStore.setState(prev => ({
+        ...prev,
+        isTrue: defaultStrategy(prev.isTrue, id, value)
       }));
-    }, [])
+    }, []),
+    onChange: useCallback((id: string, callback: (value: boolean) => void) =>
+      idStore.subscribe(() => callback(!!idStore.getState().isTrue[id])), []),
   };
 }
 export function useLocalIdState() {
@@ -49,12 +53,17 @@ export function useLocalIdState() {
     }));
   }, []);
 
+  const globalOnChange = useCallback((id: string, callback: (value: boolean) => void) =>
+    idStore.subscribe(() => callback(!!idStore.getState().isTrue[id])), []);
+
   return {
     isTrue: (localState ?? globalState).isTrue,
     setValue: actions?.setValue ?? globalSetValue,
+    onChange: actions?.onChange ?? globalOnChange,
   };
 }
-function StateProvider({ children, updateLogic, initialState = {} } 
+
+function StateProvider({ children, updateLogic, initialState = {} }
   : StateProviderProps & { updateLogic: UpdateStrategy }) {
   
   const store = useMemo(() => createStore<IdState>({ isTrue: initialState }), []);
@@ -69,7 +78,9 @@ function StateProvider({ children, updateLogic, initialState = {} }
         ...prev,
         isTrue: updateLogic(prev.isTrue, id, value)
       }));
-    }
+    },
+    onChange: (id: string, callback: (value: boolean) => void) =>
+      store.subscribe(() => callback(!!store.getState().isTrue[id])),
   }), [updateLogic]);
 
   return (

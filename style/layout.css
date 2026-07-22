@@ -307,23 +307,29 @@ main {
   }
 }
 
+/* A panel is a BOUND (see "Sizing intents" below): it has a definite height,
+   so a .scroll box inside it has something to overflow against. It clips —
+   a body that outgrows the panel must scroll, never spill. */
 .panel {
   z-index: var(--z-menu);
   position: fixed;
   max-height: 100vh;
   display: flex;
   flex-direction: column;
-  transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1), 
+  overflow: hidden;
+  transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1),
               opacity var(--transition-speed) ease;
 }
 .panel.modal {
   z-index: var(--z-modal);
 }
 
+/* Header hugs and stays put while the body scrolls under it. */
 .panel header {
   justify-content: space-between;
   width: 100%;
   height: fit-content;
+  flex-shrink: 0;
   box-sizing: border-box;
 }
 
@@ -369,26 +375,6 @@ main {
   border-top-left-radius: var(--panel-radius);
   border-bottom-left-radius: var(--panel-radius);
   box-shadow: -10px 0 15px -3px rgb(0 0 0 / 0.1);
-}
-.content {
-  height: fit-content;
-  flex-shrink: 0;
-  transition: opacity var(--transition-speed) ease;
-}
-.content[data-state='false'] { display: none; }
-.content[data-state='closed'] { animation: collapse-height var(--transition-speed) ease-in-out forwards; opacity: 0; }
-.content[data-state='open'] { animation: expand-height var(--transition-speed) ease-in-out forwards; opacity: 1; }
-
-/* Tab slider — animation in from left, transition out to right.
-   Doubled selectors outrank the later .col/.row/.container display:flex rules,
-   otherwise the grid-area stacking below never applies. */
-.tabs, .tabs.col, .tabs.row {
-  display: grid;
-  overflow: hidden;
-  width: 100%;
-}
-.tabs > * {
-  grid-area: 1 / 1; /* all children overlap in the same cell */
 }
 
 .slide {
@@ -464,18 +450,75 @@ main {
 [data-side="top"][data-state='in'] { opacity: 1; animation: slide-in-top var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
 [data-side="top"][data-state='out'] {opacity: 0; pointer-events: none; animation: slide-out-top var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) both; }
 
+.content[data-state='false'] { display: none; }
+/* Collapsed height animates to 0, so the body MUST be clipped: an unclipped
+   child keeps its full height, and at opacity 0 it goes on swallowing clicks
+   meant for whatever sits below. Hidden means unhittable, both ways. */
+.content[data-state='closed'] {
+  animation: collapse-height var(--transition-speed) ease-in-out forwards;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.content[data-state='open'] { animation: expand-height var(--transition-speed) ease-in-out forwards; opacity: 1; }
+
 /* Element Styling: Flex, Card, Group */
-.card {
-  gap: var(--space-xs);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  align-items: center;
+
+/* Tab slider — the panes stack in one grid cell so they can cross-slide.
+   Only the ACTIVE pane is in flow, so the stack is exactly as tall as what
+   you're looking at; an inactive pane can no longer pad the bottom. The
+   outgoing pane is lifted out of flow and keeps animating over the top. */
+/* Direct child of its own .tabs, never a descendant selector — tabs nest, and
+   a plain .container inside a pane must not be turned into a stack. */
+.tabs > .tab.container {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  width: 100%;
+}
+.tabs > .tab.container > * {
+  grid-area: 1 / 1; /* all panes overlap in the same cell */
+}
+.tabs > .tab.container > [data-state='out'] {
+  position: absolute;
+  inset: 0 0 auto 0; /* pinned to the cell, natural height */
 }
 
-.container {
-  overflow-y: auto;
+.card {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+/* ── Sizing intents ───────────────────────────────────────────────────
+   Every box is one of three, and it is stated at the call site —
+   never implied by the component name:
+
+     hug     (default)  height is the content's; the box never shrinks.
+     fill               takes the leftover space of its parent, and MAY
+                        shrink. Axis-agnostic: height in a .col, width in a .row.
+     scroll             fill + owns its overflow. The only box with a scrollbar.
+
+   The chain that makes scrolling work is BOUND → FILL → SCROLL:
+   one ancestor with a definite height (.panel, .screen, any max-height),
+   .fill on EVERY flex box between it and the scroller, then .scroll on the
+   one box that should scroll. `min-height: 0` is the whole reason .fill
+   exists as a separate word from "grow" — without it a flex child refuses to
+   shrink below its content and the chain silently breaks.
+
+   One scroller per bound. Nested scroll regions are a bug, not a feature. */
+.content {
+  flex-shrink: 0;
+  transition: opacity var(--transition-speed) ease;
 }
 .fit { width: fit-content; height: fit-content;}
+/* .fill/.scroll must stay BELOW .content — equal specificity, source order is
+   what lets them override its flex-shrink: 0. */
+.fill    { flex: 1 1 auto; min-height: 0; min-width: 0; }
+.scroll  { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.scrolly { overflow-x: hidden; overflow-y: auto; }
+.scrollx { overflow-x: auto;  overflow-y: hidden; }
+/* The other bound: a box sized to the viewport, for full-page layouts. */
+.screen  { height: 100dvh; }
 .center:not(.row, .col) {
   display: flex;
   align-items: center;

@@ -64,6 +64,34 @@ export function Root() {
 }
 ```
 
+### Sizing: hug, fill, scroll
+
+`Content` is a box; `Container` is the same box with a column default. Neither
+carries an opinion about size — that is a flag, so it reads at the call site:
+
+| flag | meaning |
+| --- | --- |
+| *(none)* | **hug** — height is the content's, and the box never shrinks |
+| `fill` | takes the parent's leftover space, and *may* shrink (height in a `col`, width in a `row`) |
+| `scroll` | `fill` + owns its overflow. `scrollx` / `scrolly` narrow it to one axis |
+| `screen` | a **bound** — sized to the viewport (`100dvh`) |
+
+Scrolling only works as a chain — **bound → fill → scroll**:
+
+```tsx
+<Panel bottom>            {/* bound: a definite max-height */}
+  <CloseHeader>Title</CloseHeader>   {/* hugs, stays pinned */}
+  <Card col fill>                    {/* fill: allowed to shrink */}
+    <Container scroll>…</Container>   {/* the one scrollbar */}
+  </Card>
+</Panel>
+```
+
+Every flex box between the bound and the scroller needs `fill`; miss one and
+nothing scrolls, because a flex child will not shrink below its content
+without `min-height: 0`. Use one scroller per bound — nested scroll regions
+swallow the wheel.
+
 ### Declarative State Management
 Unlike complex custom hooks, Guidon uses declarative components that handle internal state via \id\s and grouping:
 

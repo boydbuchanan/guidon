@@ -1,5 +1,5 @@
 import { FLEX_KEYS, THEME_KEYS } from "./types";
-import type { AnchorPoint, Flags, FlexProps, ThemeFlags } from "./types";
+import type { AnchorPoint, BaseProps, Flags, FlexProps, ThemeFlags } from "./types";
 import type { CSSProperties } from "react";
 
 export function cx(...args: (string | undefined | boolean | null)[]): string {
@@ -60,6 +60,7 @@ export function split<T extends Record<string, any>, K extends readonly string[]
     flags: flags as Flags<K>,
     theme: theme as ThemeFlags,
     flex: flex as FlexProps,
+    base: rest as BaseProps,
     rest
   };
 }
