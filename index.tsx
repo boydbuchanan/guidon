@@ -2,7 +2,7 @@ import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
 import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, INPUT_KEYS, PANEL_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, TEXT_KEYS } from "./types";
 import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, InputFlags, OptionProps, PanelProps, RailLayoutFlags, StateTypeFlags, TextFlags, ThemeFlags } from "./types";
 import { pluck, split, toClassNames, cx, flagClass, getAnchorStyle } from "./utils";
-import { LocalProvider, RadioProvider, SelectionProvider, ToggleProvider, type MinMax } from "./state.client";
+import { LocalProvider, RadioProvider, SelectionProvider, ToggleProvider, type MinMax, type OnSelectionChange } from "./state.client";
 
 /**
  * Container component for layout.
@@ -198,6 +198,25 @@ export function RadioGroup({
   )
 }
 
+export function Radio({
+  items,
+  children,
+  ...props
+}: React.ComponentProps<typeof RadioGroup> & { items: (OptionProps & { icon?: React.ReactNode })[] }) {
+  
+  return (
+    <RadioState items={items}>
+      <RadioGroup {...props} >
+        {items.map(({ icon, ...tab }) => (
+          <TabButton key={tab.id || crypto.randomUUID()} {...tab}>
+            {icon}
+            {tab.label}
+          </TabButton>
+        ))}
+      </RadioGroup>
+    </RadioState>
+  )
+}
 export function Tabs({
   items,
   children,
@@ -547,8 +566,9 @@ export function SquareCheckIcon({ ...props }: SvgIconProps) {
 
 export function LocalState({
   items,
-  children
-}: { items?: BaseProps[], children: React.ReactNode }) {
+  children,
+  onChange,
+}: { items?: BaseProps[], children: React.ReactNode, onChange?: OnSelectionChange }) {
   const initialState: Record<string, boolean> = {};
   if(items) {
     items.forEach(item => {
@@ -556,7 +576,7 @@ export function LocalState({
     });
   }
   return (
-    <LocalProvider initialState={initialState}>
+    <LocalProvider initialState={initialState} onChange={onChange}>
       {children}
     </LocalProvider>
   )
@@ -565,7 +585,8 @@ export function LocalState({
 export function ToggleState({
   items,
   children,
-}: { items?: BaseProps[], children: React.ReactNode }) {
+  onChange,
+}: { items?: BaseProps[], children: React.ReactNode, onChange?: OnSelectionChange }) {
   const initialState: Record<string, boolean> = {};
   if(items) {
     items.forEach(item => {
@@ -574,7 +595,7 @@ export function ToggleState({
   }
 
   return (
-    <ToggleProvider initialState={initialState}>
+    <ToggleProvider initialState={initialState} onChange={onChange}>
       {children}
     </ToggleProvider>
   )
@@ -582,7 +603,8 @@ export function ToggleState({
 export function RadioState({
   items,
   children,
-}: { items?: BaseProps[], children: React.ReactNode }) {
+  onChange,
+}: { items?: BaseProps[], children: React.ReactNode, onChange?: OnSelectionChange }) {
   const initialState: Record<string, boolean> = {};
   if(items) {
     items.forEach(item => {
@@ -591,7 +613,7 @@ export function RadioState({
   }
 
   return (
-    <RadioProvider initialState={initialState}>
+    <RadioProvider initialState={initialState} onChange={onChange}>
       {children}
     </RadioProvider>
   )
@@ -602,7 +624,8 @@ export function SelectionState({
   max,
   replace,
   children,
-}: { items?: BaseProps[], children: React.ReactNode } & MinMax) {
+  onChange,
+}: { items?: BaseProps[], children: React.ReactNode, onChange?: OnSelectionChange } & MinMax) {
   const initialState: Record<string, boolean> = {};
   if(items) {
     items.forEach(item => {
@@ -611,7 +634,7 @@ export function SelectionState({
   }
 
   return (
-    <SelectionProvider initialState={initialState} min={min} max={max} replace={replace}>
+    <SelectionProvider initialState={initialState} min={min} max={max} replace={replace} onChange={onChange}>
       {children}
     </SelectionProvider>
   )

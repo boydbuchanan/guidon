@@ -15,9 +15,13 @@ export type IdActions = {
   setValue: (id: string, value: boolean) => void;
   onChange: (id: string, callback: (value: boolean) => void) => () => void;
 };
-export type StateProviderProps = { 
-  children: React.ReactNode, 
-  initialState?: IsTrueMap
+
+export type OnSelectionChange = (id: string, value: boolean, isTrue: IsTrueMap) => void;
+
+export type StateProviderProps = {
+  children: React.ReactNode,
+  initialState?: IsTrueMap,
+  onChange?: OnSelectionChange,
 }
 
 export const idStore = createStore(defaultState);
@@ -63,25 +67,27 @@ export function useLocalIdState() {
   };
 }
 
-function StateProvider({ children, updateLogic, initialState = {} }
+function StateProvider({ children, updateLogic, initialState = {}, onChange }
   : StateProviderProps & { updateLogic: UpdateStrategy }) {
-  
+
   const store = useMemo(() => createStore<IdState>({ isTrue: initialState }), []);
-  
-  // 1. Subscribe to the store to force this component to re-render
+
   const state = useStore(store);
 
-  // 2. Actions are now stable. They never change, even when state changes.
   const actions = useMemo(() => ({
     setValue: (id: string, value?: boolean) => {
       store.setState((prev) => ({
         ...prev,
         isTrue: updateLogic(prev.isTrue, id, value)
       }));
+      if (onChange) {
+        const isTrue = store.getState().isTrue;
+        onChange(id, !!isTrue[id], isTrue);
+      }
     },
     onChange: (id: string, callback: (value: boolean) => void) =>
       store.subscribe(() => callback(!!store.getState().isTrue[id])),
-  }), [updateLogic]);
+  }), [updateLogic, onChange]);
 
   return (
     <ActionContext.Provider value={actions}>
