@@ -30,6 +30,15 @@ export function StateContent({
   );
 };
 
+export function HideStateContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof StateContent>) {
+  const { isTrue } = useLocalIdState();
+  if (props.id && !isTrue[props.id]) return null;
+  return <StateContent {...props}/>
+};
+
 export function StateButton({
   children,
   id,

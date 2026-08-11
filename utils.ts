@@ -1,5 +1,5 @@
 import { FLEX_KEYS, THEME_KEYS } from "./types";
-import type { AnchorPoint, BaseProps, Flags, FlexProps, ThemeFlags } from "./types";
+import type { AnchorPoint, BaseProps, Flags, FlexProps, TextProps, ThemeFlags } from "./types";
 import type { CSSProperties } from "react";
 
 export function cx(...args: (string | undefined | boolean | null)[]): string {
@@ -98,6 +98,13 @@ export function flagsToString<T extends readonly string[]>(flags: Flags<T>): str
     .join(' ');
 }
 
+export function textClasses(options?: TextProps): string {
+  if (!options) return "";
+  const fontSize = options.size ? ( options.size === true ? "full-width" : `font-${options.size}`) : undefined;
+  return cx(
+    fontSize,
+  );
+}
 export function flexClasses(options?: FlexProps): string {
   if (!options) return "row";
   const gapStyle = options.gap ? ( options.gap === true ? "gap" : `gap-${options.gap}`) : undefined;

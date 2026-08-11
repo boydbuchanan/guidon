@@ -89,6 +89,9 @@ export type AnchorProps = { anchorId?: string, anchorTo?: string, anchorPoint?: 
 
 export type OptionProps = BaseProps & ButtonVariantProps & { label: string };
 export const TEXT_KEYS = ['bold', 'semibold', 'underline', 'italic', 'strike', 'caps', 'nums'] as const;
+export type FontProps = { size?: number | boolean; }
+export const textProps: FontProps = {};
 export type TextFlags = Flags<typeof TEXT_KEYS>;
+export type TextProps = TextFlags & FontProps;
 export const INPUT_KEYS = ['sunken'] as const;
 export type InputFlags = Flags<typeof INPUT_KEYS>;

@@ -71,9 +71,9 @@ header.menu {
   --item-ghost:  var(--destructive-ghost);
 }
 .muted {
-  --item-color:  var(--muted-foreground);
+  --item-color:  var(--muted);
   --item-fg:     var(--muted-foreground);
-  --item-light:  var(--muted);
+  --item-light:  var(--muted-light);
   --item-dark:   var(--muted-dark);
   --item-border: var(--muted);
   --item-ghost:  color-mix(in oklch, var(--muted), transparent 80%);
@@ -96,7 +96,7 @@ header.menu {
 .inactive { background: transparent; color: var(--item-fg); }
 
 /* Text-only */
-.text { background: initial; color: var(--item-color); }
+.text { background: transparent; }
 
 /*==========================================
   FORM ELEMENTS

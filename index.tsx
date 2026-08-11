@@ -1,7 +1,7 @@
 import { Backdrop, Portal, StateButton, StateContent } from "./index.client";
 import { BASE_KEYS, BUTTON_VARIANT_KEYS, CONTENT_KEYS, INPUT_KEYS, PANEL_KEYS, STATE_DEFAULT, STATE_KEYS, STATE_MAP, TEXT_KEYS } from "./types";
-import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, InputFlags, OptionProps, PanelProps, RailLayoutFlags, StateTypeFlags, TextFlags, ThemeFlags } from "./types";
-import { pluck, split, toClassNames, cx, flagClass, getAnchorStyle } from "./utils";
+import type { AnchorProps, BaseProps, ButtonVariantProps, ContentProps, InputFlags, OptionProps, PanelProps, RailLayoutFlags, StateTypeFlags, TextProps, ThemeFlags } from "./types";
+import { pluck, split, toClassNames, cx, flagClass, getAnchorStyle, textClasses } from "./utils";
 import { LocalProvider, RadioProvider, SelectionProvider, ToggleProvider, type MinMax, type OnSelectionChange } from "./state.client";
 
 /**
@@ -47,7 +47,7 @@ export function Content({
   if(props.id){
     const [on, off] = stateType && STATE_MAP[stateType] || STATE_DEFAULT;
 
-    return <StateContent trueState={on} falseState={off} className={cx(baseClasses, stateType, className)} style={styleProps} {...rest}  />
+    return <StateContent as={Component} trueState={on} falseState={off} className={cx(baseClasses, stateType, className)} style={styleProps} {...rest}  />
   }
   return <Component className={cx(baseClasses, className)} style={styleProps} {...rest} />
 };
@@ -102,10 +102,9 @@ export function Input({
   ...props
 }: React.ComponentProps<'input'> & InputFlags) {
   const { flags, rest, ...base } = split(props, INPUT_KEYS);
-  const cssClasses = flagClass(flags, INPUT_KEYS);
   const baseClasses = toClassNames({ flags, rest, ...base });
 
-  return <input className={cx('input', className, cssClasses, baseClasses)} style={style} {...props} />
+  return <input type={type} className={cx('input', className, baseClasses)} style={style} {...rest} />
 }
 
 
@@ -114,18 +113,20 @@ export function Input({
  * Should be used with h1-h6, p, or other text elements to ensure semantic HTML.
  * Matches .text css class.
  */
-export function Text({as = "span", className, ...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType } & TextFlags & ThemeFlags) {
+export function Text({as = "p", className, size, ...props}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType } & TextProps & ThemeFlags) {
   const Component = (as) as React.ElementType;
   const { flags, rest, ...base } = split(props, TEXT_KEYS);
-  const cssClasses = flagClass(flags, TEXT_KEYS);
   const baseClasses = toClassNames({ flags, rest, ...base });
+  const fontClasses = textClasses({ size });
 
-  return <Component className={cx('text', className, cssClasses, baseClasses)} {...props} />
+  return <Component className={cx('text', className, baseClasses, fontClasses)} {...rest} />
 }
-export function Span({className, ...props}: React.HTMLAttributes<HTMLElement> & TextFlags) {
-  return <Text as="span" className={cx('text', className)} {...props} />
+export function Small({className, ...props}: React.ComponentProps<typeof Text>) {
+  return <Text as="small" className={className} {...props} />
 }
-
+export function Span({className, ...props}: React.ComponentProps<typeof Text>) {
+  return <Text as="span" className={className} {...props} />
+}
 export function Link({className, ...props}: React.ComponentProps<"a"> ) {
   return <a className={cx('text link', className)} {...props} />
 }

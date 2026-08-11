@@ -21,8 +21,8 @@
   --destructive-hex: #e33d65;
   --destructive-foreground-hex: #ffffff;
   --highlight-1-hex: #73fce5;
-  --highlight-2-hex: #fcc875;
-  --highlight-3-hex: #8bfea6;
+  --highlight-2-hex: #e07218;
+  --highlight-3-hex: #26cc4c;
   --highlight-4-hex: #6296fe;
   --highlight-5-hex: #ffbaef;
 
@@ -65,6 +65,8 @@
 
   --muted: oklch(from var(--muted-hex) l c h);
   --muted-foreground: oklch(from var(--muted-foreground-hex) l c h);
+  --muted-light: oklch(from var(--muted-hex) 1 c h);
+  --muted-ghost: color-mix(in oklch, var(--muted), transparent 80%);
   --muted-dark: oklch(from var(--muted-hex) 0.8 c h);
 
   --accent: var(--accent-hex);
