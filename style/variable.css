@@ -50,6 +50,12 @@
   --background: oklch(from var(--background-hex) l c h);
   --foreground: oklch(from var(--foreground-hex) l c h);
 
+  /* The surface a control rises TO when it is the active one in a group — see
+     button.tab[data-state='true'] in theme.css. Light mode rises toward white,
+     but dark mode rises *lighter than the muted track*, which --background is
+     not, so this is re-declared per theme rather than derived from one hex. */
+  --surface-raised: oklch(from var(--background-hex) 1 c h);
+
   --primary: var(--primary-hex);
   --primary-foreground: var(--primary-foreground-hex);
   --primary-light: oklch(from var(--primary-hex) 0.6 c h);
@@ -91,7 +97,10 @@
   --border-style: 1px solid var(--border);
 
   --input: oklch(from var(--input-hex) l c h);
-  --ring:  color-mix(in oklch, var(--ring), transparent 85%);
+  /* theme.css has always read this, but it was never derived from its -hex, so
+     field text fell through to whatever it inherited. */
+  --input-foreground: oklch(from var(--input-foreground-hex) l c h);
+  --ring:  color-mix(in oklch, var(--ring-hex), transparent 85%);
   --scroll-track: oklch(from var(--scroll-track-hex) l c h);
   --scroll-thumb: oklch(from var(--scroll-thumb-hex) l c h);
 
@@ -102,6 +111,19 @@
 
   --menu: oklch(from var(--menu-hex) l c h);
   --menu-foreground: oklch(from var(--menu-foreground-hex) l c h);
+
+  /* Shadows. A black shadow reads as depth on a light surface and as nothing on
+     a dark one, so the alpha — not the colour — is what changes per theme.
+     Three depths: ambient (--shadow-sm/-md), the cast edge of a rail or panel,
+     and the deep one used by .sunken / .raised / the active tab. */
+  --shadow-color: oklch(0% 0 0 / 0.08);
+  --shadow-edge:  oklch(0% 0 0 / 0.10);
+  --shadow-deep:  oklch(0% 0 0 / 0.30);
+  --shadow-sm: 0 1px 2px var(--shadow-color);
+  --shadow-md: 0 4px 12px var(--shadow-color);
+
+  /* Veil behind a sheet or modal. Dimming an already-dark page takes more of it. */
+  --backdrop: oklch(0% 0 0 / 0.2);
 }
 
 [data-theme='dark'] {
@@ -109,12 +131,15 @@
   --background-hex: #111111;
   --foreground-hex: #eeeeee;
 
+  /* --primary-hex is identical in both themes, so --primary-foreground-hex is
+     too: #f6f6f6 on #1d6ebb is 5.25:1, black on it only 4.0:1 (fails AA). */
   --primary-hex: #1d6ebb;
-  --primary-foreground-hex: #000000;
   --secondary-hex: #ffffff;
   --secondary-foreground-hex: #0e0808;
   --accent-hex: #b8edff;
-  --accent-foreground-hex: #07779c;
+  /* Darkened from #07779c, which was only 4.02:1 on the #b8edff accent fill that
+     .outline[data-state='true'] paints (the active sort/filter toggle). */
+  --accent-foreground-hex: #065c78;
   --muted-hex: #212121;
   --muted-foreground-hex: #dedede;
   --destructive-hex: #b70101;
@@ -128,14 +153,65 @@
   /* Controls */
 
   --border-hex: #474747;
-  --input-hex: #828282;
+  /* A field is a recessed surface, so in dark it sits below the card, not above
+     it. The old #828282 was a light-mode field dropped into a dark UI — and
+     --input-foreground-hex was never overridden, so it kept :root's #0f172a
+     navy and rendered dark text on mid-grey. */
+  --input-hex: #1c1c1c;
+  --input-foreground-hex: #eeeeee;
   --ring-hex: #b8edff;
   --scroll-track-hex: transparent;
   --scroll-thumb-hex: #474747;
-  
+
   /* Components */
   --menu-hex: #000000;
   --menu-foreground-hex: #ffffff;
   --card-hex: #141414;
   --card-foreground-hex: #ffffff;
+
+  /* ── Derived tokens re-tuned for a dark surface ───────────────────────
+     Everything above is a raw *-hex input, and every derived token in :root
+     re-resolves from it automatically — EXCEPT the ones that hardcode a
+     lightness (`oklch(from var(--x-hex) 0.6 c h)`). Those keep their
+     light-mode lightness no matter which hex they read, so they must be
+     re-declared here.
+
+     The pair inverts between themes. In light, `-light` moves toward white
+     and `-dark` toward black. In dark, both move UP: `-light` means
+     emphasized (or, for a surface, raised above the track) and `-dark` means
+     receded — still readable, just quieter. Values are placed against the
+     dark surface ladder: background #111 (L .18) < card #141414 (L .20) <
+     muted track (L .26) < raised control (L .32) < border #474747 (L .40).
+
+     The worst offender this fixes is --muted-light, which was
+     `oklch(from var(--muted-hex) 1 c h)` — lightness pinned to 1, i.e. pure
+     white in every theme. theme.css paints `.muted` with it, and `.muted` is
+     on every tab strip and every badge, so dark mode rendered white boxes. */
+
+  --surface-raised: oklch(from var(--muted-hex) 0.35 c h);
+
+  /* Consumed as text on the muted track (button[data-state='inactive']:hover)
+     and as a link hover on the page background — both need to be light here. */
+  --primary-light: oklch(from var(--primary-hex) 0.72 c h);
+  --primary-dark:  oklch(from var(--primary-hex) 0.62 c h);
+
+  /* --secondary-hex is #ffffff in dark, so chroma is 0 and these are greys. */
+  --secondary-light: oklch(from var(--secondary-hex) 0.85 c h);
+  --secondary-dark:  oklch(from var(--secondary-hex) 0.70 c h);
+
+  /* -light is a SURFACE here (the .muted track); -dark is receded text. */
+  --muted-light: oklch(from var(--muted-hex) 0.26 c h);
+  --muted-dark:  oklch(from var(--muted-hex) 0.66 c h);
+
+  --accent-light: oklch(from var(--accent-hex) 0.88 c h);
+  --accent-dark:  oklch(from var(--accent-hex) 0.70 c h);
+
+  --destructive-light: oklch(from var(--destructive-hex) 0.68 c h);
+  --destructive-dark:  oklch(from var(--destructive-hex) 0.56 c h);
+
+  /* Same black, more of it — a 0.08 alpha shadow is invisible against #111. */
+  --shadow-color: oklch(0% 0 0 / 0.24);
+  --shadow-edge:  oklch(0% 0 0 / 0.45);
+  --shadow-deep:  oklch(0% 0 0 / 0.60);
+  --backdrop:     oklch(0% 0 0 / 0.6);
 }

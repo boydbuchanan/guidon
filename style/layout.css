@@ -41,22 +41,29 @@
   --z-sheet: 50;
   --z-modal: 60;
 
-  /* SHADOWS (Using OKLCH for softer shadows) */
-  --shadow-color: oklch(0% 0 0 / 0.08);
-  --shadow-sm: 0 1px 2px var(--shadow-color);
-  --shadow-md: 0 4px 12px var(--shadow-color);
-  
+  /* SHADOWS live with the other colour tokens in variable.css — their alpha has
+     to change per theme, and this block has no dark counterpart. */
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  /* Follows the data-theme toggle, not the OS. Declared as `light dark` this
+     was static, so native widgets (select popups, scrollbars, date pickers)
+     picked their own scheme and ignored the theme button entirely. */
+  color-scheme: light;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* Kept next to the :root declaration above, not in variable.css with the colour
+   tokens: `:root` and `[data-theme='dark']` have equal specificity, so whichever
+   file is imported LAST wins. variable.css comes first, so a dark rule there is
+   silently overridden by the `color-scheme: light` above. */
+[data-theme='dark'] { color-scheme: dark; }
+
 /* Base styles */
 #light-icon:not([data-theme='dark'] *), #dark-icon:not([data-theme='light'] *) { display: none; }
 
@@ -73,7 +80,7 @@ a {
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.2);
+  background: var(--backdrop);
   backdrop-filter: blur(4px);
   transition: opacity 0.3s ease;
   z-index: var(--z-sheet);
@@ -82,8 +89,12 @@ a {
 .spinner {
   width: 2.5rem;
   height: 2.5rem;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top-color: white;
+  /* Was hardcoded white, which is invisible on a light surface. currentColor
+     rather than --foreground: a spinner inherits the text colour of whatever it
+     sits on, and its main caller is the splash overlay, whose surface is
+     --primary with --primary-foreground text — not the page background. */
+  border: 3px solid color-mix(in oklch, currentColor, transparent 75%);
+  border-top-color: currentColor;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -234,13 +245,13 @@ header.sticky {
   right: 0;
   border-left: 1px solid var(--border);
   /* Left Shadow */
-  box-shadow: -4px 0 15px -3px rgb(0 0 0 / 0.1);
+  box-shadow: -4px 0 15px -3px var(--shadow-edge);
 }
 .rail[data-side="left"] {
   left: 0;
   border-right: 1px solid var(--border);
   /* Right Shadow */
-  box-shadow: 4px 0 15px -3px rgb(0 0 0 / 0.1);
+  box-shadow: 4px 0 15px -3px var(--shadow-edge);
 }
 
 .rail-left .rail.panel, .rail-right .rail.panel {
@@ -281,7 +292,7 @@ main {
     bottom: 0;
     width: 100%;
     z-index: var(--z-rail);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -2px 10px var(--shadow-edge);
   }
   nav.rail {
     position: unset;
@@ -363,7 +374,7 @@ main {
   border-right: var(--border-style);
   border-top-right-radius: var(--panel-radius);
   border-bottom-right-radius: var(--panel-radius);
-  box-shadow: 0 -10px 15px -3px rgb(0 0 0 / 0.1);
+  box-shadow: 0 -10px 15px -3px var(--shadow-edge);
 }
 
 .panel[data-side="right"] {
@@ -374,7 +385,7 @@ main {
   border-left: var(--border-style);
   border-top-left-radius: var(--panel-radius);
   border-bottom-left-radius: var(--panel-radius);
-  box-shadow: -10px 0 15px -3px rgb(0 0 0 / 0.1);
+  box-shadow: -10px 0 15px -3px var(--shadow-edge);
 }
 
 .slide {

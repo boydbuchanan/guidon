@@ -104,16 +104,20 @@ header.menu {
 
 .disabled { cursor: not-allowed; opacity: 0.6; pointer-events: none; }
 
-input {
+/* select is styled alongside input: without it the control falls back to UA
+   colours, which is a light-mode widget sitting in a dark UI. The
+   `color-scheme` split in layout.css is what makes its popup list follow the
+   theme — this rule only covers the closed control. */
+input, select {
   background: var(--input);
   color: var(--input-foreground);
   border: var(--border-style);
 }
-input:focus {
+input:focus, select:focus {
   box-shadow: 0 0 2px 1px var(--primary);
 }
-.sunken { box-shadow: inset 0 1px 6px rgba(0,0,0,0.3); }
-.raised { box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.sunken { box-shadow: inset 0 1px 6px var(--shadow-deep); }
+.raised { box-shadow: 0 2px 4px var(--shadow-deep); }
 header {
   border-bottom: 1px solid var(--border);
 }
@@ -167,8 +171,12 @@ button[data-state='inactive']:hover { background: var(--muted); color: var(--pri
 button[data-state='active']         { background: var(--item-color); }
 button[data-state='false'] { background: transparent; color: var(--item-dark); }
 /* Active segment = the light surface raised on the group's (muted/grey) track —
-   "white on grey" — not a solid item-colour fill. This is the TAB look. */
-button.tab[data-state='true']  { background: var(--item-fg); color: var(--item-color); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+   "white on grey" — not a solid item-colour fill. This is the TAB look.
+   The raised surface is its own token, not --item-fg: for a plain button
+   --item-fg is --background, which is only the *lightest* surface in light
+   mode. In dark mode --background is the DARKEST one, so borrowing it put the
+   active chip below its own track instead of above it. */
+button.tab[data-state='true']  { background: var(--surface-raised); color: var(--item-color); box-shadow: 0 2px 4px var(--shadow-deep); }
 
 /* A bordered toggle (outline) keeps its border in every state and FILLS with
    the item colour when active — the button-GROUP look, distinct from a tab.
