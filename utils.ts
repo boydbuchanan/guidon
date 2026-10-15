@@ -100,7 +100,10 @@ export function flagsToString<T extends readonly string[]>(flags: Flags<T>): str
 
 export function textClasses(options?: TextProps): string {
   if (!options) return "";
-  const fontSize = options.size ? ( options.size === true ? "full-width" : `font-${options.size}`) : undefined;
+  /* `size` true means the base step. It used to emit "full-width" — a width
+     utility copy-pasted from flexClasses below, which set no font size at all.
+     Note `size={0}` is falsy, so font-0 is only reachable through `size`. */
+  const fontSize = options.size ? ( options.size === true ? "font-0" : `font-${options.size}`) : undefined;
   return cx(
     fontSize,
   );
